@@ -123,12 +123,21 @@ USE_MINIO = False
 AWS_S3_ENDPOINT_URL = None
 
 # =============================================================================
-# SECURITY
+# SECURITY & CORS
 # =============================================================================
+# Allow all Vercel preview domains
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
+]
+
+# Add Vercel preview domains pattern
+CSRF_TRUSTED_ORIGINS += [
+    "https://*.vercel.app",
 ]
 
 # =============================================================================
