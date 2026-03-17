@@ -5,21 +5,10 @@
   "installCommand": "pnpm install",
   "outputDirectory": "apps/web/build/client",
 
-  "functions": {
-    "apps/api/api/index.py": {
-      "runtime": "python3.11",
-      "maxDuration": 60
-    }
-  },
-
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "/apps/api/api/index.py"
-    },
-    {
-      "source": "/api/:path*",
-      "destination": "/apps/api/api/index.py"
+      "destination": "/api/index.py"
     },
     {
       "source": "/((?!api/).*)",
