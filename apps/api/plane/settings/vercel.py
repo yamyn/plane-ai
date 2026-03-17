@@ -116,7 +116,15 @@ STATIC_URL = "/static/"
 # =============================================================================
 # Use Vercel Blob for file storage (avatars, attachments, exports)
 # Requires BLOB_READ_WRITE_TOKEN environment variable
-DEFAULT_FILE_STORAGE = "plane.utils.storage.vercel_blob.VercelBlobStorage"
+# Note: Using STORAGES (Django 4.2+) instead of deprecated DEFAULT_FILE_STORAGE
+STORAGES = {
+    "default": {
+        "BACKEND": "plane.utils.storage.vercel_blob.VercelBlobStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Disable S3/Minio
 USE_MINIO = False
