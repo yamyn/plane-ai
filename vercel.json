@@ -6,37 +6,18 @@
   "outputDirectory": "apps/web/build/client",
   "framework": null,
 
-  "functions": {
-    "api/index.py": {
-      "memory": 1024,
-      "maxDuration": 60
-    },
-    "api/health.py": {
-      "memory": 128,
-      "maxDuration": 10
-    }
-  },
-
   "rewrites": [
     {
-      "source": "/api/v1/:path*",
-      "destination": "/api/index"
+      "source": "/api/health",
+      "destination": "/api/health"
     },
     {
-      "source": "/api/instances/:path*",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/api/public/:path*",
+      "source": "/api/:path*",
       "destination": "/api/index"
     },
     {
       "source": "/auth/:path*",
       "destination": "/api/index"
-    },
-    {
-      "source": "/api/health",
-      "destination": "/api/health"
     }
   ],
 
