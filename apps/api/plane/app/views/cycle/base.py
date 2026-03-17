@@ -17,9 +17,11 @@ from django.db.models import (
     Exists,
     F,
     Func,
+    IntegerField,
     OuterRef,
     Prefetch,
     Q,
+    Subquery,
     UUIDField,
     Value,
     When,
@@ -87,6 +89,73 @@ class CycleViewSet(BaseViewSet):
         # Convert project local time back to UTC for comparison (start_date is stored in UTC)
         current_time_in_utc = current_time_in_project_tz.astimezone(pytz.utc)
 
+        # Subqueries for estimate points by state group
+        backlog_estimate_point = (
+            Issue.issue_objects.filter(
+                estimate_point__estimate__type="points",
+                state__group="backlog",
+                issue_cycle__cycle_id=OuterRef("pk"),
+                issue_cycle__deleted_at__isnull=True,
+            )
+            .values("issue_cycle__cycle_id")
+            .annotate(points=Sum(Cast("estimate_point__value", FloatField())))
+            .values("points")[:1]
+        )
+        unstarted_estimate_point = (
+            Issue.issue_objects.filter(
+                estimate_point__estimate__type="points",
+                state__group="unstarted",
+                issue_cycle__cycle_id=OuterRef("pk"),
+                issue_cycle__deleted_at__isnull=True,
+            )
+            .values("issue_cycle__cycle_id")
+            .annotate(points=Sum(Cast("estimate_point__value", FloatField())))
+            .values("points")[:1]
+        )
+        started_estimate_point = (
+            Issue.issue_objects.filter(
+                estimate_point__estimate__type="points",
+                state__group="started",
+                issue_cycle__cycle_id=OuterRef("pk"),
+                issue_cycle__deleted_at__isnull=True,
+            )
+            .values("issue_cycle__cycle_id")
+            .annotate(points=Sum(Cast("estimate_point__value", FloatField())))
+            .values("points")[:1]
+        )
+        completed_estimate_point = (
+            Issue.issue_objects.filter(
+                estimate_point__estimate__type="points",
+                state__group="completed",
+                issue_cycle__cycle_id=OuterRef("pk"),
+                issue_cycle__deleted_at__isnull=True,
+            )
+            .values("issue_cycle__cycle_id")
+            .annotate(points=Sum(Cast("estimate_point__value", FloatField())))
+            .values("points")[:1]
+        )
+        cancelled_estimate_point = (
+            Issue.issue_objects.filter(
+                estimate_point__estimate__type="points",
+                state__group="cancelled",
+                issue_cycle__cycle_id=OuterRef("pk"),
+                issue_cycle__deleted_at__isnull=True,
+            )
+            .values("issue_cycle__cycle_id")
+            .annotate(points=Sum(Cast("estimate_point__value", FloatField())))
+            .values("points")[:1]
+        )
+        total_estimate_point = (
+            Issue.issue_objects.filter(
+                estimate_point__estimate__type="points",
+                issue_cycle__cycle_id=OuterRef("pk"),
+                issue_cycle__deleted_at__isnull=True,
+            )
+            .values("issue_cycle__cycle_id")
+            .annotate(points=Sum(Cast("estimate_point__value", FloatField())))
+            .values("points")[:1]
+        )
+
         return self.filter_queryset(
             super()
             .get_queryset()
@@ -150,7 +219,87 @@ class CycleViewSet(BaseViewSet):
                 )
             )
             .annotate(
+                started_issues=Count(
+                    "issue_cycle__issue__id",
+                    distinct=True,
+                    filter=Q(
+                        issue_cycle__issue__state__group="started",
+                        issue_cycle__issue__archived_at__isnull=True,
+                        issue_cycle__issue__is_draft=False,
+                        issue_cycle__deleted_at__isnull=True,
+                        issue_cycle__issue__deleted_at__isnull=True,
+                    ),
+                )
+            )
+            .annotate(
+                unstarted_issues=Count(
+                    "issue_cycle__issue__id",
+                    distinct=True,
+                    filter=Q(
+                        issue_cycle__issue__state__group="unstarted",
+                        issue_cycle__issue__archived_at__isnull=True,
+                        issue_cycle__issue__is_draft=False,
+                        issue_cycle__deleted_at__isnull=True,
+                        issue_cycle__issue__deleted_at__isnull=True,
+                    ),
+                )
+            )
+            .annotate(
+                backlog_issues=Count(
+                    "issue_cycle__issue__id",
+                    distinct=True,
+                    filter=Q(
+                        issue_cycle__issue__state__group="backlog",
+                        issue_cycle__issue__archived_at__isnull=True,
+                        issue_cycle__issue__is_draft=False,
+                        issue_cycle__deleted_at__isnull=True,
+                        issue_cycle__issue__deleted_at__isnull=True,
+                    ),
+                )
+            )
+            # Estimate points annotations
+            .annotate(
+                backlog_estimate_points=Coalesce(
+                    Subquery(backlog_estimate_point),
+                    Value(0, output_field=FloatField()),
+                )
+            )
+            .annotate(
+                unstarted_estimate_points=Coalesce(
+                    Subquery(unstarted_estimate_point),
+                    Value(0, output_field=FloatField()),
+                )
+            )
+            .annotate(
+                started_estimate_points=Coalesce(
+                    Subquery(started_estimate_point),
+                    Value(0, output_field=FloatField()),
+                )
+            )
+            .annotate(
+                completed_estimate_points=Coalesce(
+                    Subquery(completed_estimate_point),
+                    Value(0, output_field=FloatField()),
+                )
+            )
+            .annotate(
+                cancelled_estimate_points=Coalesce(
+                    Subquery(cancelled_estimate_point),
+                    Value(0, output_field=FloatField()),
+                )
+            )
+            .annotate(
+                total_estimate_points=Coalesce(
+                    Subquery(total_estimate_point),
+                    Value(0, output_field=FloatField()),
+                )
+            )
+            .annotate(
                 status=Case(
+                    # Priority 1: Manual status overrides date-based logic
+                    When(manual_status="completed", then=Value("COMPLETED")),
+                    When(manual_status="started", then=Value("CURRENT")),
+                    # Priority 2: Date-based (existing logic)
                     When(
                         Q(start_date__lte=current_time_in_utc) & Q(end_date__gte=current_time_in_utc),
                         then=Value("CURRENT"),
@@ -200,9 +349,12 @@ class CycleViewSet(BaseViewSet):
         # Convert project local time back to UTC for comparison (start_date is stored in UTC)
         current_time_in_utc = current_time_in_project_tz.astimezone(pytz.utc)
 
-        # Current Cycle
+        # Current Cycle (manually started or date-based)
         if cycle_view == "current":
-            queryset = queryset.filter(start_date__lte=current_time_in_utc, end_date__gte=current_time_in_utc)
+            queryset = queryset.filter(
+                Q(manual_status="started") |
+                (Q(manual_status__isnull=True) & Q(start_date__lte=current_time_in_utc) & Q(end_date__gte=current_time_in_utc))
+            ).exclude(manual_status="completed")
 
             data = queryset.values(
                 # necessary fields
@@ -221,16 +373,30 @@ class CycleViewSet(BaseViewSet):
                 "external_id",
                 "progress_snapshot",
                 "logo_props",
+                # manual sprint control fields
+                "manual_status",
+                "started_at",
+                "completed_at",
                 "is_favorite",
                 "total_issues",
                 "completed_issues",
                 "cancelled_issues",
+                "started_issues",
+                "unstarted_issues",
+                "backlog_issues",
+                # estimate points
+                "backlog_estimate_points",
+                "unstarted_estimate_points",
+                "started_estimate_points",
+                "completed_estimate_points",
+                "cancelled_estimate_points",
+                "total_estimate_points",
                 "assignee_ids",
                 "status",
                 "version",
                 "created_by",
             )
-            datetime_fields = ["start_date", "end_date"]
+            datetime_fields = ["start_date", "end_date", "started_at", "completed_at"]
             data = user_timezone_converter(data, datetime_fields, project_timezone)
 
             if data:
@@ -253,17 +419,31 @@ class CycleViewSet(BaseViewSet):
             "external_id",
             "progress_snapshot",
             "logo_props",
+            # manual sprint control fields
+            "manual_status",
+            "started_at",
+            "completed_at",
             # meta fields
             "is_favorite",
             "total_issues",
             "cancelled_issues",
             "completed_issues",
+            "started_issues",
+            "unstarted_issues",
+            "backlog_issues",
+            # estimate points
+            "backlog_estimate_points",
+            "unstarted_estimate_points",
+            "started_estimate_points",
+            "completed_estimate_points",
+            "cancelled_estimate_points",
+            "total_estimate_points",
             "assignee_ids",
             "status",
             "version",
             "created_by",
         )
-        datetime_fields = ["start_date", "end_date"]
+        datetime_fields = ["start_date", "end_date", "started_at", "completed_at"]
         data = user_timezone_converter(data, datetime_fields, project_timezone)
         return Response(data, status=status.HTTP_200_OK)
 
@@ -296,10 +476,25 @@ class CycleViewSet(BaseViewSet):
                         "progress_snapshot",
                         "logo_props",
                         "version",
+                        # manual sprint control fields
+                        "manual_status",
+                        "started_at",
+                        "completed_at",
                         # meta fields
                         "is_favorite",
                         "total_issues",
                         "completed_issues",
+                        "cancelled_issues",
+                        "started_issues",
+                        "unstarted_issues",
+                        "backlog_issues",
+                        # estimate points
+                        "backlog_estimate_points",
+                        "unstarted_estimate_points",
+                        "started_estimate_points",
+                        "completed_estimate_points",
+                        "cancelled_estimate_points",
+                        "total_estimate_points",
                         "assignee_ids",
                         "status",
                         "created_by",
@@ -311,7 +506,7 @@ class CycleViewSet(BaseViewSet):
                 project = Project.objects.get(id=self.kwargs.get("project_id"))
                 project_timezone = project.timezone
 
-                datetime_fields = ["start_date", "end_date"]
+                datetime_fields = ["start_date", "end_date", "started_at", "completed_at"]
                 cycle = user_timezone_converter(cycle, datetime_fields, project_timezone)
 
                 # Send the model activity
@@ -346,9 +541,13 @@ class CycleViewSet(BaseViewSet):
 
         request_data = request.data
 
-        if cycle.end_date is not None and cycle.end_date < timezone.now():
+        # Check if cycle is completed (either manually or by date)
+        is_manually_completed = cycle.manual_status == "completed"
+        is_date_completed = cycle.end_date is not None and cycle.end_date < timezone.now()
+
+        if is_manually_completed or is_date_completed:
             if "sort_order" in request_data:
-                # Can only change sort order for a completed cycle``
+                # Can only change sort order for a completed cycle
                 request_data = {"sort_order": request_data.get("sort_order", cycle.sort_order)}
             else:
                 return Response(
@@ -377,10 +576,25 @@ class CycleViewSet(BaseViewSet):
                 "progress_snapshot",
                 "logo_props",
                 "version",
+                # manual sprint control fields
+                "manual_status",
+                "started_at",
+                "completed_at",
                 # meta fields
                 "is_favorite",
                 "total_issues",
                 "completed_issues",
+                "cancelled_issues",
+                "started_issues",
+                "unstarted_issues",
+                "backlog_issues",
+                # estimate points
+                "backlog_estimate_points",
+                "unstarted_estimate_points",
+                "started_estimate_points",
+                "completed_estimate_points",
+                "cancelled_estimate_points",
+                "total_estimate_points",
                 "assignee_ids",
                 "status",
                 "created_by",
@@ -390,7 +604,7 @@ class CycleViewSet(BaseViewSet):
             project = Project.objects.get(id=self.kwargs.get("project_id"))
             project_timezone = project.timezone
 
-            datetime_fields = ["start_date", "end_date"]
+            datetime_fields = ["start_date", "end_date", "started_at", "completed_at"]
             cycle = user_timezone_converter(cycle, datetime_fields, project_timezone)
 
             # Send the model activity
@@ -444,10 +658,25 @@ class CycleViewSet(BaseViewSet):
                 "sub_issues",
                 "logo_props",
                 "version",
+                # manual sprint control fields
+                "manual_status",
+                "started_at",
+                "completed_at",
                 # meta fields
                 "is_favorite",
                 "total_issues",
                 "completed_issues",
+                "cancelled_issues",
+                "started_issues",
+                "unstarted_issues",
+                "backlog_issues",
+                # estimate points
+                "backlog_estimate_points",
+                "unstarted_estimate_points",
+                "started_estimate_points",
+                "completed_estimate_points",
+                "cancelled_estimate_points",
+                "total_estimate_points",
                 "assignee_ids",
                 "status",
                 "created_by",
@@ -462,7 +691,7 @@ class CycleViewSet(BaseViewSet):
         # Fetch the project timezone
         project = Project.objects.get(id=self.kwargs.get("project_id"))
         project_timezone = project.timezone
-        datetime_fields = ["start_date", "end_date"]
+        datetime_fields = ["start_date", "end_date", "started_at", "completed_at"]
         data = user_timezone_converter(data, datetime_fields, project_timezone)
 
         recent_visited_task.delay(

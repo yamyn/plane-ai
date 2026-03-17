@@ -9,7 +9,7 @@ import type { TIssue } from "./issues/issue";
 import type { LOGICAL_OPERATOR, TSupportedOperators } from "./rich-filters";
 import type { CompleteOrEmpty } from "./utils";
 
-export type TIssueLayouts = "list" | "kanban" | "calendar" | "spreadsheet" | "gantt_chart";
+export type TIssueLayouts = "list" | "kanban" | "calendar" | "spreadsheet" | "gantt_chart" | "grouped_board";
 
 export type TIssueGroupByOptions =
   | "state"
@@ -58,7 +58,18 @@ export type TIssueOrderByOptions =
 
 export type TIssueGroupingFilters = "active" | "backlog";
 
-export type TIssueExtraOptions = "show_empty_groups" | "sub_issue";
+// Type for sorting cycle groups
+export type TCycleGroupOrderByOptions =
+  | "sort_order" // Manual (default)
+  | "start_date" // By start date ascending
+  | "-start_date" // By start date descending
+  | "end_date" // By end date ascending
+  | "-end_date"; // By end date descending
+
+export type TIssueExtraOptions = "show_empty_groups" | "show_empty_sub_groups" | "sub_issue" | "hide_completed_cycles";
+
+// Type for cycle status filter
+export type TCycleStatusFilter = "current" | "upcoming" | "completed" | "draft";
 
 export type TIssueParams =
   | "priority"
@@ -156,7 +167,11 @@ export interface IIssueDisplayFilterOptions {
   layout?: any; // TODO: Need to fix this and set it to enum EIssueLayoutTypes
   order_by?: TIssueOrderByOptions;
   show_empty_groups?: boolean;
+  show_empty_sub_groups?: boolean;
   sub_issue?: boolean;
+  cycle_group_order_by?: TCycleGroupOrderByOptions;
+  hide_completed_cycles?: boolean;
+  cycle_status?: TCycleStatusFilter[];
 }
 export interface IIssueDisplayProperties {
   assignee?: boolean;

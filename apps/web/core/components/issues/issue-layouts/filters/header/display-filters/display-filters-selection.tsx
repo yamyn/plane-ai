@@ -20,6 +20,8 @@ import {
   FilterGroupBy,
   FilterOrderBy,
   FilterSubGroupBy,
+  FilterCycleGroupOrderBy,
+  FilterCycleStatus,
 } from "@/components/issues/issue-layouts/filters";
 
 type Props = {
@@ -123,13 +125,43 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
         </div>
       )}
 
+      {/* Cycle Group Order By - only when group_by is cycle */}
+      {displayFilters?.group_by === "cycle" && (
+        <div className="py-2">
+          <FilterCycleGroupOrderBy
+            selectedCycleGroupOrderBy={displayFilters?.cycle_group_order_by}
+            handleUpdate={(val) =>
+              handleDisplayFiltersUpdate({
+                cycle_group_order_by: val,
+              })
+            }
+          />
+        </div>
+      )}
+
+      {/* Cycle Status Filter - only when cycle view is enabled */}
+      {!cycleViewDisabled && (
+        <div className="py-2">
+          <FilterCycleStatus
+            selectedCycleStatus={displayFilters?.cycle_status}
+            handleUpdate={(val) =>
+              handleDisplayFiltersUpdate({
+                cycle_status: val,
+              })
+            }
+          />
+        </div>
+      )}
+
       {/* Options */}
       {layoutDisplayFiltersOptions?.extra_options.access && (
         <div className="py-2">
           <FilterExtraOptions
             selectedExtraOptions={{
               show_empty_groups: displayFilters?.show_empty_groups ?? true,
+              show_empty_sub_groups: displayFilters?.show_empty_sub_groups ?? true,
               sub_issue: displayFilters?.sub_issue ?? true,
+              hide_completed_cycles: displayFilters?.hide_completed_cycles ?? false,
             }}
             handleUpdate={(key, val) =>
               handleDisplayFiltersUpdate({
@@ -137,6 +169,8 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
               })
             }
             enabledExtraOptions={layoutDisplayFiltersOptions?.extra_options.values}
+            groupBy={displayFilters?.group_by}
+            subGroupBy={displayFilters?.sub_group_by}
           />
         </div>
       )}

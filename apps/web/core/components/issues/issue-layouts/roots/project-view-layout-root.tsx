@@ -14,6 +14,7 @@ import { EIssuesStoreType, EIssueLayoutTypes } from "@plane/types";
 // hooks
 import { ProjectLevelWorkItemFiltersHOC } from "@/components/work-item-filters/filters-hoc/project-level";
 import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
+import { QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
 import { useIssues } from "@/hooks/store/use-issues";
 import { useProjectView } from "@/hooks/store/use-project-view";
 import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
@@ -21,6 +22,7 @@ import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
 import { IssuePeekOverview } from "../../peek-overview";
 import { ProjectViewCalendarLayout } from "../calendar/roots/project-view-root";
 import { BaseGanttRoot } from "../gantt";
+import { ProjectViewGroupedBoardLayout } from "../grouped-board/roots/project-view-root";
 import { ProjectViewKanBanLayout } from "../kanban/roots/project-view-root";
 import { ProjectViewListLayout } from "../list/roots/project-view-root";
 import { ProjectViewSpreadsheetLayout } from "../spreadsheet/roots/project-view-root";
@@ -37,6 +39,8 @@ function ProjectViewIssueLayout(props: { activeLayout: EIssueLayoutTypes | undef
       return <BaseGanttRoot viewId={props.viewId} />;
     case EIssueLayoutTypes.SPREADSHEET:
       return <ProjectViewSpreadsheetLayout />;
+    case EIssueLayoutTypes.GROUPED_BOARD:
+      return <ProjectViewGroupedBoardLayout />;
     default:
       return null;
   }
@@ -107,6 +111,8 @@ export const ProjectViewLayoutRoot = observer(function ProjectViewLayoutRoot() {
                 trackerElements={{
                   saveView: PROJECT_VIEW_TRACKER_ELEMENTS.HEADER_SAVE_VIEW_BUTTON,
                 }}
+                leftSlot={<QuickFiltersBar filter={projectViewWorkItemsFilter} projectId={projectId} />}
+                excludeProperties={["assignee_id"]}
               />
             )}
             <div className="relative h-full w-full overflow-auto">

@@ -15,12 +15,14 @@ import { Row, ERowVariant } from "@plane/ui";
 // hooks
 import { ProjectLevelWorkItemFiltersHOC } from "@/components/work-item-filters/filters-hoc/project-level";
 import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
+import { QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
 import { useIssues } from "@/hooks/store/use-issues";
 import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
 // local imports
 import { IssuePeekOverview } from "../../peek-overview";
 import { ModuleCalendarLayout } from "../calendar/roots/module-root";
 import { BaseGanttRoot } from "../gantt";
+import { ModuleGroupedBoardLayout } from "../grouped-board/roots/module-root";
 import { ModuleKanBanLayout } from "../kanban/roots/module-root";
 import { ModuleListLayout } from "../list/roots/module-root";
 import { ModuleSpreadsheetLayout } from "../spreadsheet/roots/module-root";
@@ -37,6 +39,8 @@ function ModuleIssueLayout(props: { activeLayout: EIssueLayoutTypes | undefined;
       return <BaseGanttRoot viewId={props.moduleId} />;
     case EIssueLayoutTypes.SPREADSHEET:
       return <ModuleSpreadsheetLayout />;
+    case EIssueLayoutTypes.GROUPED_BOARD:
+      return <ModuleGroupedBoardLayout />;
     default:
       return null;
   }
@@ -87,6 +91,8 @@ export const ModuleLayoutRoot = observer(function ModuleLayoutRoot() {
                 trackerElements={{
                   saveView: PROJECT_VIEW_TRACKER_ELEMENTS.MODULE_HEADER_SAVE_AS_VIEW_BUTTON,
                 }}
+                leftSlot={<QuickFiltersBar filter={moduleWorkItemsFilter} projectId={projectId} />}
+                excludeProperties={["assignee_id"]}
               />
             )}
             <Row variant={ERowVariant.HUGGING} className="h-full w-full overflow-auto">

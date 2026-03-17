@@ -18,6 +18,7 @@ import { TransferIssuesModal } from "@/components/cycles/transfer-issues-modal";
 // hooks
 import { ProjectLevelWorkItemFiltersHOC } from "@/components/work-item-filters/filters-hoc/project-level";
 import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
+import { QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
 import { useCycle } from "@/hooks/store/use-cycle";
 import { useIssues } from "@/hooks/store/use-issues";
 import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
@@ -25,6 +26,7 @@ import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
 import { IssuePeekOverview } from "../../peek-overview";
 import { CycleCalendarLayout } from "../calendar/roots/cycle-root";
 import { BaseGanttRoot } from "../gantt";
+import { CycleGroupedBoardLayout } from "../grouped-board/roots/cycle-root";
 import { CycleKanBanLayout } from "../kanban/roots/cycle-root";
 import { CycleListLayout } from "../list/roots/cycle-root";
 import { CycleSpreadsheetLayout } from "../spreadsheet/roots/cycle-root";
@@ -45,6 +47,8 @@ function CycleIssueLayout(props: {
       return <BaseGanttRoot viewId={props.cycleId} isCompletedCycle={props.isCompletedCycle} />;
     case EIssueLayoutTypes.SPREADSHEET:
       return <CycleSpreadsheetLayout />;
+    case EIssueLayoutTypes.GROUPED_BOARD:
+      return <CycleGroupedBoardLayout />;
     default:
       return null;
   }
@@ -117,6 +121,8 @@ export const CycleLayoutRoot = observer(function CycleLayoutRoot() {
                   trackerElements={{
                     saveView: PROJECT_VIEW_TRACKER_ELEMENTS.CYCLE_HEADER_SAVE_AS_VIEW_BUTTON,
                   }}
+                  leftSlot={<QuickFiltersBar filter={cycleWorkItemsFilter} projectId={projectId} />}
+                  excludeProperties={["assignee_id"]}
                 />
               )}
               <div className="h-full w-full overflow-auto">

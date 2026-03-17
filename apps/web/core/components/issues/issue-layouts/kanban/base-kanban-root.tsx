@@ -65,6 +65,7 @@ export const BaseKanBanRoot = observer(function BaseKanBanRoot(props: IBaseKanBa
   const { workspaceSlug, projectId } = useParams();
   // store hooks
   const storeType = useIssueStoreType() as KanbanStoreType;
+
   const { allowPermissions } = useUserPermissions();
   const { issueMap, issuesFilter, issues } = useIssues(storeType);
   const {
@@ -109,6 +110,7 @@ export const BaseKanBanRoot = observer(function BaseKanBanRoot(props: IBaseKanBa
   );
 
   const groupedIssueIds = issues?.groupedIssueIds;
+  console.log('issues 222:>> ', issues);
 
   const userDisplayFilters = displayFilters || null;
 
@@ -271,6 +273,7 @@ export const BaseKanBanRoot = observer(function BaseKanBanRoot(props: IBaseKanBa
                 groupedIssueIds={groupedIssueIds ?? {}}
                 getGroupIssueCount={issues.getGroupIssueCount}
                 displayProperties={displayProperties}
+                displayFilters={displayFilters}
                 sub_group_by={sub_group_by}
                 group_by={group_by}
                 orderBy={orderBy}
@@ -280,6 +283,7 @@ export const BaseKanBanRoot = observer(function BaseKanBanRoot(props: IBaseKanBa
                 collapsedGroups={collapsedGroups}
                 enableQuickIssueCreate={enableQuickAdd}
                 showEmptyGroup={userDisplayFilters?.show_empty_groups ?? true}
+                showEmptySubGroup={userDisplayFilters?.show_empty_sub_groups ?? true}
                 quickAddCallback={quickAddIssue}
                 disableIssueCreation={!enableIssueCreation || !isEditingAllowed || isCompletedCycle}
                 canEditProperties={canEditProperties}

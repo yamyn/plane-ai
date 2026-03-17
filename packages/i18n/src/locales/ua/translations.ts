@@ -1047,6 +1047,8 @@ export default {
       extra: {
         show_sub_issues: "Показати похідні робочі одиниці",
         show_empty_groups: "Показати порожні групи",
+        show_empty_sub_groups: "Показати порожні підгрупи",
+        hide_completed_cycles: "Приховати завершені цикли",
       },
     },
     layouts: {
@@ -1056,12 +1058,14 @@ export default {
       calendar: "Календар",
       spreadsheet: "Таблиця",
       gantt: "Діаграма Ганта",
+      grouped_board: "Групована дошка",
       title: {
         list: "Спискове розташування",
         kanban: "Розташування «Дошка»",
         calendar: "Розташування «Календар»",
         spreadsheet: "Табличне розташування",
         gantt: "Розташування «Діаграма Ганта»",
+        grouped_board: "Розташування «Групована дошка»",
       },
     },
     states: {
