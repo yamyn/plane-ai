@@ -1,23 +1,42 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "pnpm turbo run build --filter=web",
   "installCommand": "pnpm install",
-  "outputDirectory": "apps/web/build/client",
-  "framework": null,
 
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/health",
-      "destination": "/api/health"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "pnpm turbo run build --filter=web",
+        "outputDirectory": "apps/web/build/client"
+      }
     },
     {
-      "source": "/api/:path*",
-      "destination": "/api/index"
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+
+  "routes": [
+    {
+      "src": "/api/health",
+      "dest": "/api/health.py"
     },
     {
-      "source": "/auth/:path*",
-      "destination": "/api/index"
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/auth/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
 
