@@ -26,6 +26,11 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SCOUT_MONITOR = False
 
 # =============================================================================
+# MIDDLEWARE - Remove MongoDB-based loggers (pymongo not available)
+# =============================================================================
+MIDDLEWARE = [m for m in MIDDLEWARE if "plane.middleware.logger" not in m]
+
+# =============================================================================
 # DATABASE - Use connection pooling for serverless
 # =============================================================================
 # For Neon: Use pooled connection string
