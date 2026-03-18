@@ -29,6 +29,14 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SCOUT_MONITOR = False
 
 # =============================================================================
+# INSTALLED_APPS - Remove Celery apps (not installed on Vercel)
+# =============================================================================
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in [
+    "django_celery_beat",
+    "django_celery_results",
+]]
+
+# =============================================================================
 # MIDDLEWARE - Remove MongoDB-based loggers (pymongo not available)
 # =============================================================================
 MIDDLEWARE = [m for m in MIDDLEWARE if "plane.middleware.logger" not in m]
