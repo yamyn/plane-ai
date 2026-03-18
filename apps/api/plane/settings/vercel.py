@@ -10,9 +10,42 @@ This configuration is optimized for Vercel's serverless environment:
 - Database connection pooling (required for serverless)
 - Celery tasks run synchronously (no workers available)
 - Stateless operation
+
+TODO (Vercel Migration):
+- Background tasks execute synchronously (may cause request timeouts)
+- Scheduled jobs (Celery Beat) are disabled
+- Consider Vercel Cron Jobs or external queue services for async work
 """
 
 import os
+import sys
+
+# =============================================================================
+# CELERY MOCK - Patch before importing anything that uses Celery
+# =============================================================================
+# This must happen BEFORE importing from .common to prevent Celery import errors
+from plane.utils.celery_sync import shared_task as sync_shared_task
+
+# Create a mock celery module
+class MockCeleryModule:
+    shared_task = sync_shared_task
+
+    class Celery:
+        def __init__(self, *args, **kwargs):
+            pass
+        def config_from_object(self, *args, **kwargs):
+            pass
+        def autodiscover_tasks(self, *args, **kwargs):
+            pass
+        conf = type('conf', (), {'beat_schedule': {}, 'beat_scheduler': None})()
+
+# Inject mock celery into sys.modules BEFORE any imports
+sys.modules['celery'] = MockCeleryModule()
+sys.modules['celery.schedules'] = type(sys)('celery.schedules')
+sys.modules['celery.schedules'].crontab = lambda **kwargs: None
+sys.modules['celery.signals'] = type(sys)('celery.signals')
+sys.modules['celery.signals'].after_setup_logger = type('Signal', (), {'connect': lambda self, f: f})()
+sys.modules['celery.signals'].after_setup_task_logger = type('Signal', (), {'connect': lambda self, f: f})()
 
 from .common import *  # noqa
 
