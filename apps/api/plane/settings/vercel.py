@@ -37,9 +37,11 @@ INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in [
 ]]
 
 # =============================================================================
-# MIDDLEWARE - Remove MongoDB-based loggers (pymongo not available)
+# MIDDLEWARE - Remove MongoDB-based loggers and CSRF (API uses token auth)
 # =============================================================================
 MIDDLEWARE = [m for m in MIDDLEWARE if "plane.middleware.logger" not in m]
+# Remove CSRF middleware - APIs use token authentication, not cookies
+MIDDLEWARE = [m for m in MIDDLEWARE if "csrf" not in m.lower()]
 
 # =============================================================================
 # DATABASE - Use connection pooling for serverless
@@ -47,21 +49,34 @@ MIDDLEWARE = [m for m in MIDDLEWARE if "plane.middleware.logger" not in m]
 # For Neon: Use pooled connection string
 # For Supabase: Use transaction pooler (port 6543)
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_DB", "plane"),
-        "USER": os.environ.get("POSTGRES_USER", "plane"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "plane"),
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-        "CONN_MAX_AGE": 0,  # Don't persist connections in serverless
-        "CONN_HEALTH_CHECKS": False,
-        "OPTIONS": {
-            "sslmode": os.environ.get("POSTGRES_SSLMODE", "require"),
-        },
+import dj_database_url
+
+if os.environ.get("DATABASE_URL"):
+    # Use DATABASE_URL if provided (recommended for Neon/Supabase)
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"),
+            conn_max_age=0,  # Don't persist connections in serverless
+            conn_health_checks=False,
+        )
     }
-}
+else:
+    # Fallback to individual POSTGRES_* variables
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB", "plane"),
+            "USER": os.environ.get("POSTGRES_USER", "plane"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "plane"),
+            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+            "CONN_MAX_AGE": 0,
+            "CONN_HEALTH_CHECKS": False,
+            "OPTIONS": {
+                "sslmode": os.environ.get("POSTGRES_SSLMODE", "require"),
+            },
+        }
+    }
 
 # =============================================================================
 # CELERY - Run tasks synchronously (no workers in serverless)
