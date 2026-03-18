@@ -3,7 +3,6 @@
 # See the LICENSE file for details.
 
 # Python imports
-import boto3
 from datetime import timedelta
 
 # Django imports
@@ -13,7 +12,6 @@ from django.db.models import Q
 
 # Third party imports
 from celery import shared_task
-from botocore.client import Config
 
 # Module imports
 from plane.db.models import ExporterHistory
@@ -21,6 +19,10 @@ from plane.db.models import ExporterHistory
 
 @shared_task
 def delete_old_s3_link():
+    # Lazy import boto3
+    import boto3
+    from botocore.client import Config
+
     # Get a list of keys and IDs to process
     expired_exporter_history = ExporterHistory.objects.filter(
         Q(url__isnull=False) & Q(created_at__lte=timezone.now() - timedelta(days=8))

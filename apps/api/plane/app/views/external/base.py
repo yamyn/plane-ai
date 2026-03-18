@@ -7,7 +7,6 @@ import os
 from typing import List, Dict, Tuple
 
 # Third party import
-from openai import OpenAI
 import requests
 
 from rest_framework import status
@@ -124,6 +123,12 @@ def get_llm_response(task, prompt, api_key: str, model: str, provider: str) -> T
     """Helper to get LLM completion response"""
     final_text = task + "\n" + prompt
     try:
+        # Lazy import OpenAI
+        try:
+            from openai import OpenAI
+        except ImportError:
+            return None, "OpenAI library is not installed"
+
         # For Gemini, prepend provider name to model
         if provider.lower() == "gemini":
             model = f"gemini/{model}"

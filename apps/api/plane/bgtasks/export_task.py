@@ -6,8 +6,6 @@
 import io
 import zipfile
 from typing import List
-import boto3
-from botocore.client import Config
 from uuid import UUID
 
 # Third party imports
@@ -43,6 +41,10 @@ def upload_to_s3(zip_file: io.BytesIO, workspace_id: UUID, token_id: str, slug: 
     """
     Upload a ZIP file to S3 and generate a presigned URL.
     """
+    # Lazy import boto3
+    import boto3
+    from botocore.client import Config
+
     file_name = f"{workspace_id}/export-{slug}-{token_id[:6]}-{str(timezone.now().date())}.zip"
     expires_in = 7 * 24 * 60 * 60
 

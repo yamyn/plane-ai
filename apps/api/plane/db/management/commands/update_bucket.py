@@ -4,8 +4,6 @@
 
 # Python imports
 import os
-import boto3
-from botocore.exceptions import ClientError
 import json
 
 # Django imports
@@ -16,6 +14,8 @@ class Command(BaseCommand):
     help = "Create the default bucket for the instance"
 
     def get_s3_client(self):
+        # Lazy import boto3
+        import boto3
         s3_client = boto3.client(
             "s3",
             endpoint_url=os.environ.get("AWS_S3_ENDPOINT_URL"),  # MinIO endpoint
@@ -28,6 +28,7 @@ class Command(BaseCommand):
 
     # Check if the access key has the required permissions
     def check_s3_permissions(self, bucket_name):
+        from botocore.exceptions import ClientError
         s3_client = self.get_s3_client()
         permissions = {
             "s3:GetObject": False,
@@ -132,6 +133,8 @@ class Command(BaseCommand):
         return
 
     def handle(self, *args, **options):
+        from botocore.exceptions import ClientError
+
         # Create a session using the credentials from Django settings
 
         # Check if the bucket exists
