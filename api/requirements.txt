@@ -48,8 +48,12 @@ whitenoise==6.11.0
 # Excel export
 openpyxl==3.1.2
 
-# External services (optional, may need to remove if causing issues)
-# openai==1.63.2
-# slack-sdk==3.27.1
-# posthog==3.5.0
-# boto3==1.34.96
+# Optional dependencies (lazy imported, not required for startup)
+# These are commented out to reduce bundle size for Vercel
+# Uncomment if you need these features:
+# pymongo==4.6.3       # MongoDB support
+# openai==1.63.2       # AI features
+# posthog==3.5.0       # Analytics
+# boto3==1.34.96       # S3 storage (not needed with Vercel Blob)
+# slack-sdk==3.27.1    # Slack integration
+# scout-apm==3.1.0     # APM monitoring

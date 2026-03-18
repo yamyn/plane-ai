@@ -9,7 +9,6 @@ from typing import Dict, Any
 
 # third party imports
 from celery import shared_task
-from posthog import Posthog
 
 # module imports
 from plane.license.utils.instance_value import get_configuration_value
@@ -60,6 +59,13 @@ def preprocess_data_properties(
 
 @shared_task
 def track_event(user_id: uuid.UUID, event_name: str, slug: str, event_properties: Dict[str, Any]):
+    # Lazy import posthog
+    try:
+        from posthog import Posthog
+    except ImportError:
+        logger.warning("posthog is not installed. Event tracking is disabled.")
+        return
+
     POSTHOG_API_KEY, POSTHOG_HOST = posthogConfiguration()
 
     if not (POSTHOG_API_KEY and POSTHOG_HOST):

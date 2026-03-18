@@ -4,8 +4,6 @@
 
 # Python imports
 import os
-import boto3
-from botocore.exceptions import ClientError
 
 # Django imports
 from django.core.management import BaseCommand
@@ -15,6 +13,10 @@ class Command(BaseCommand):
     help = "Create the default bucket for the instance"
 
     def handle(self, *args, **options):
+        # Lazy import boto3
+        import boto3
+        from botocore.exceptions import ClientError
+
         # Create a session using the credentials from Django settings
         try:
             s3_client = boto3.client(

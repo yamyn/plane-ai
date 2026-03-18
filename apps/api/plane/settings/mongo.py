@@ -5,12 +5,26 @@
 # Django imports
 from django.conf import settings
 import logging
+from typing import Optional, TypeVar, Type, Any
 
-# Third party imports
-from pymongo import MongoClient
-from pymongo.database import Database
-from pymongo.collection import Collection
-from typing import Optional, TypeVar, Type
+# Lazy imports for pymongo (optional dependency)
+MongoClient = None
+Database = None
+Collection = None
+
+def _ensure_pymongo():
+    """Lazy load pymongo when needed."""
+    global MongoClient, Database, Collection
+    if MongoClient is None:
+        try:
+            from pymongo import MongoClient as _MongoClient
+            from pymongo.database import Database as _Database
+            from pymongo.collection import Collection as _Collection
+            MongoClient = _MongoClient
+            Database = _Database
+            Collection = _Collection
+        except ImportError:
+            pass
 
 
 T = TypeVar("T", bound="MongoConnection")
@@ -28,13 +42,13 @@ class MongoConnection:
 
     Attributes:
         _instance (Optional[MongoConnection]): The singleton instance of this class
-        _client (Optional[MongoClient]): The MongoDB client instance
-        _db (Optional[Database]): The MongoDB database instance
+        _client: The MongoDB client instance
+        _db: The MongoDB database instance
     """
 
     _instance: Optional["MongoConnection"] = None
-    _client: Optional[MongoClient] = None
-    _db: Optional[Database] = None
+    _client: Optional[Any] = None
+    _db: Optional[Any] = None
 
     def __new__(cls: Type[T]) -> T:
         """
@@ -46,6 +60,13 @@ class MongoConnection:
         if cls._instance is None:
             cls._instance = super(MongoConnection, cls).__new__(cls)
             try:
+                _ensure_pymongo()
+                if MongoClient is None:
+                    logger.warning(
+                        "pymongo is not installed. MongoDB functionality will be disabled."
+                    )
+                    return cls._instance
+
                 mongo_url = getattr(settings, "MONGO_DB_URL", None)
                 mongo_db_database = getattr(settings, "MONGO_DB_DATABASE", None)
 
@@ -68,7 +89,7 @@ class MongoConnection:
         return cls._instance
 
     @classmethod
-    def get_client(cls) -> Optional[MongoClient]:
+    def get_client(cls) -> Optional[Any]:
         """
         Returns the MongoDB client instance.
 
@@ -80,7 +101,7 @@ class MongoConnection:
         return cls._client
 
     @classmethod
-    def get_db(cls) -> Optional[Database]:
+    def get_db(cls) -> Optional[Any]:
         """
         Returns the MongoDB database instance.
 
@@ -92,7 +113,7 @@ class MongoConnection:
         return cls._db
 
     @classmethod
-    def get_collection(cls, collection_name: str) -> Optional[Collection]:
+    def get_collection(cls, collection_name: str) -> Optional[Any]:
         """
         Returns a MongoDB collection by name.
 

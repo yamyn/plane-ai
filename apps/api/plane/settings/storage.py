@@ -5,15 +5,17 @@
 # Python imports
 import os
 import uuid
-
-# Third party imports
-import boto3
-from botocore.exceptions import ClientError
 from urllib.parse import quote
 
 # Module imports
 from plane.utils.exception_logger import log_exception
-from storages.backends.s3boto3 import S3Boto3Storage
+
+# Lazy import for S3Boto3Storage base class
+try:
+    from storages.backends.s3boto3 import S3Boto3Storage
+except ImportError:
+    # Fallback base class if django-storages not configured for S3
+    from django.core.files.storage import Storage as S3Boto3Storage
 
 
 class S3Storage(S3Boto3Storage):
@@ -23,6 +25,9 @@ class S3Storage(S3Boto3Storage):
     """S3 storage class to generate presigned URLs for S3 objects"""
 
     def __init__(self, request=None):
+        # Lazy import boto3
+        import boto3
+
         # Get the AWS credentials and bucket name from the environment
         self.aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID")
         # Use the AWS_SECRET_ACCESS_KEY environment variable for the secret key
