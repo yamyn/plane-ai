@@ -51,8 +51,11 @@ openpyxl==3.1.2
 # MongoDB (required for import, but connection is optional)
 pymongo==4.6.3
 
-# External services (optional, may need to remove if causing issues)
-# openai==1.63.2
-# slack-sdk==3.27.1
-# posthog==3.5.0
-# boto3==1.34.96
+# External services (required for imports even if not used)
+openai==1.63.2
+slack-sdk==3.27.1
+posthog==3.5.0
+boto3==1.34.96
+
+# APM (required for import)
+scout-apm==3.1.0
