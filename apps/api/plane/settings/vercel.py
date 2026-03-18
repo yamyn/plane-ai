@@ -11,41 +11,11 @@ This configuration is optimized for Vercel's serverless environment:
 - Celery tasks run synchronously (no workers available)
 - Stateless operation
 
-TODO (Vercel Migration):
-- Background tasks execute synchronously (may cause request timeouts)
-- Scheduled jobs (Celery Beat) are disabled
-- Consider Vercel Cron Jobs or external queue services for async work
+NOTE: Celery is mocked in api/index.py before Django loads.
+See .claude/TODO-vercel.md for list of disabled features.
 """
 
 import os
-import sys
-
-# =============================================================================
-# CELERY MOCK - Patch before importing anything that uses Celery
-# =============================================================================
-# This must happen BEFORE importing from .common to prevent Celery import errors
-from plane.utils.celery_sync import shared_task as sync_shared_task
-
-# Create a mock celery module
-class MockCeleryModule:
-    shared_task = sync_shared_task
-
-    class Celery:
-        def __init__(self, *args, **kwargs):
-            pass
-        def config_from_object(self, *args, **kwargs):
-            pass
-        def autodiscover_tasks(self, *args, **kwargs):
-            pass
-        conf = type('conf', (), {'beat_schedule': {}, 'beat_scheduler': None})()
-
-# Inject mock celery into sys.modules BEFORE any imports
-sys.modules['celery'] = MockCeleryModule()
-sys.modules['celery.schedules'] = type(sys)('celery.schedules')
-sys.modules['celery.schedules'].crontab = lambda **kwargs: None
-sys.modules['celery.signals'] = type(sys)('celery.signals')
-sys.modules['celery.signals'].after_setup_logger = type('Signal', (), {'connect': lambda self, f: f})()
-sys.modules['celery.signals'].after_setup_task_logger = type('Signal', (), {'connect': lambda self, f: f})()
 
 from .common import *  # noqa
 
@@ -57,6 +27,14 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Disable Scout APM (not compatible with serverless)
 SCOUT_MONITOR = False
+
+# =============================================================================
+# INSTALLED_APPS - Remove Celery apps (not installed on Vercel)
+# =============================================================================
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app not in [
+    "django_celery_beat",
+    "django_celery_results",
+]]
 
 # =============================================================================
 # MIDDLEWARE - Remove MongoDB-based loggers (pymongo not available)
