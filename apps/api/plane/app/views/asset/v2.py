@@ -157,6 +157,8 @@ class UserAssetsV2Endpoint(BaseAPIView):
         storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
+        # Add asset_id to fields for Vercel Blob proxy to update metadata
+        presigned_url["fields"]["asset_id"] = str(asset.id)
         # Return the presigned URL
         return Response(
             {
@@ -366,6 +368,8 @@ class WorkspaceFileAssetEndpoint(BaseAPIView):
         storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
+        # Add asset_id to fields for Vercel Blob proxy to update metadata
+        presigned_url["fields"]["asset_id"] = str(asset.id)
         # Return the presigned URL
         return Response(
             {
@@ -457,7 +461,12 @@ class StaticFileAssetEndpoint(BaseAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Get the presigned URL
+        # Check if we have a Vercel Blob URL stored in metadata
+        vercel_blob_url = asset.storage_metadata.get("vercel_blob_url") if asset.storage_metadata else None
+        if vercel_blob_url:
+            return HttpResponseRedirect(vercel_blob_url)
+
+        # Get the presigned URL from storage
         storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         signed_url = storage.generate_presigned_url(object_name=asset.asset.name)
@@ -566,6 +575,8 @@ class ProjectAssetEndpoint(BaseAPIView):
         storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
+        # Add asset_id to fields for Vercel Blob proxy to update metadata
+        presigned_url["fields"]["asset_id"] = str(asset.id)
         # Return the presigned URL
         return Response(
             {
@@ -778,6 +789,64 @@ class DuplicateAssetEndpoint(BaseAPIView):
         FileAsset.objects.filter(id=duplicated_asset.id).update(is_uploaded=True)
 
         return Response({"asset_id": str(duplicated_asset.id)}, status=status.HTTP_200_OK)
+
+
+class VercelBlobUploadProxyEndpoint(BaseAPIView):
+    """
+    Proxy endpoint for Vercel Blob uploads.
+
+    Since Vercel Blob doesn't support S3-style presigned POST (CORS blocks Authorization header),
+    this endpoint receives the file from the frontend and uploads it to Vercel Blob server-side.
+    """
+
+    def post(self, request):
+        # Get the file and metadata from the request
+        file = request.FILES.get("file")
+        key = request.POST.get("key") or request.data.get("key")
+        asset_id = request.POST.get("asset_id") or request.data.get("asset_id")
+
+        if not file:
+            return Response(
+                {"error": "No file provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not key:
+            return Response(
+                {"error": "No key provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Get storage and upload
+        storage = get_storage(request=request)
+
+        # Read file content
+        file_content = file.read()
+        content_type = file.content_type or "application/octet-stream"
+
+        # Upload to Vercel Blob
+        result = storage.upload_file(
+            file_obj=file_content,
+            object_name=key,
+            content_type=content_type,
+        )
+
+        if not result:
+            return Response(
+                {"error": "Failed to upload file"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # Update FileAsset with the actual Vercel Blob URL
+        if asset_id and result.get("url"):
+            try:
+                FileAsset.objects.filter(id=asset_id).update(
+                    storage_metadata={"vercel_blob_url": result.get("url")}
+                )
+            except Exception:
+                pass  # Don't fail upload if metadata update fails
+
+        return Response({"status": "ok", "url": result.get("url", "")}, status=status.HTTP_200_OK)
 
 
 class WorkspaceAssetDownloadEndpoint(BaseAPIView):

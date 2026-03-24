@@ -20,6 +20,7 @@ from plane.app.views import (
     DuplicateAssetEndpoint,
     WorkspaceAssetDownloadEndpoint,
     ProjectAssetDownloadEndpoint,
+    VercelBlobUploadProxyEndpoint,
 )
 
 
@@ -46,6 +47,11 @@ urlpatterns = [
         name="file-assets-restore",
     ),
     # V2 Endpoints
+    path(
+        "assets/v2/upload-proxy/",
+        VercelBlobUploadProxyEndpoint.as_view(),
+        name="vercel-blob-upload-proxy",
+    ),
     path(
         "assets/v2/workspaces/<str:slug>/",
         WorkspaceFileAssetEndpoint.as_view(),
