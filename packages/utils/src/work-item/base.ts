@@ -286,6 +286,7 @@ export const getComputedDisplayFilters = (
     show_empty_sub_groups: filters?.show_empty_sub_groups || false,
     cycle_group_order_by: filters?.cycle_group_order_by || "sort_order",
     hide_completed_cycles: filters?.hide_completed_cycles || false,
+    show_estimates_progress: filters?.show_estimates_progress || false,
     cycle_status: filters?.cycle_status || undefined,
   };
 };

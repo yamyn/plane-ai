@@ -27,6 +27,7 @@ import { getComputedDisplayFilters, getComputedDisplayProperties, getTabIndex } 
 import { DisplayFiltersSelection, FiltersDropdown } from "@/components/issues/issue-layouts/filters";
 import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
 // hooks
+import { useProjectEstimates } from "@/hooks/store/estimates";
 import { useProject } from "@/hooks/store/use-project";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // plane web imports
@@ -61,6 +62,7 @@ export const ProjectViewForm = observer(function ProjectViewForm(props: Props) {
   // store hooks
   const { getProjectById } = useProject();
   const { isMobile } = usePlatformOS();
+  const { areEstimateEnabledByProjectId } = useProjectEstimates();
   // form info
   const defaultValues = {
     ...DEFAULT_VALUES,
@@ -81,6 +83,7 @@ export const ProjectViewForm = observer(function ProjectViewForm(props: Props) {
   // derived values
   const projectDetails = getProjectById(projectId);
   const logoValue = watch("logo_props");
+  const areEstimatesEnabled = areEstimateEnabledByProjectId(projectId);
   const workItemFilters: IIssueFilters = {
     richFilters: getValues("rich_filters"),
     displayFilters: getValues("display_filters"),
@@ -243,6 +246,7 @@ export const ProjectViewForm = observer(function ProjectViewForm(props: Props) {
                           }}
                           cycleViewDisabled={!projectDetails?.cycle_view}
                           moduleViewDisabled={!projectDetails?.module_view}
+                          areEstimatesEnabled={areEstimatesEnabled}
                         />
                       </FiltersDropdown>
                     )}

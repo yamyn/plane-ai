@@ -15,7 +15,7 @@ import { Row, ERowVariant } from "@plane/ui";
 // hooks
 import { ProjectLevelWorkItemFiltersHOC } from "@/components/work-item-filters/filters-hoc/project-level";
 import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
-import { QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
+import { EstimatesProgressBar, QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
 import { useIssues } from "@/hooks/store/use-issues";
 import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
 // local imports
@@ -53,10 +53,11 @@ export const ModuleLayoutRoot = observer(function ModuleLayoutRoot() {
   const projectId = routerProjectId ? routerProjectId.toString() : undefined;
   const moduleId = routerModuleId ? routerModuleId.toString() : undefined;
   // hooks
-  const { issuesFilter } = useIssues(EIssuesStoreType.MODULE);
+  const { issues, issuesFilter, issueMap } = useIssues(EIssuesStoreType.MODULE);
   // derived values
   const workItemFilters = moduleId ? issuesFilter?.getIssueFilters(moduleId) : undefined;
   const activeLayout = workItemFilters?.displayFilters?.layout || undefined;
+  const showEstimatesProgress = workItemFilters?.displayFilters?.show_estimates_progress ?? false;
 
   useSWR(
     workspaceSlug && projectId && moduleId
@@ -91,7 +92,16 @@ export const ModuleLayoutRoot = observer(function ModuleLayoutRoot() {
                 trackerElements={{
                   saveView: PROJECT_VIEW_TRACKER_ELEMENTS.MODULE_HEADER_SAVE_AS_VIEW_BUTTON,
                 }}
-                leftSlot={<QuickFiltersBar filter={moduleWorkItemsFilter} projectId={projectId} />}
+                leftSlot={
+                  <>
+                    <QuickFiltersBar filter={moduleWorkItemsFilter} projectId={projectId} />
+                    <EstimatesProgressBar
+                      groupedIssueIds={issues.groupedIssueIds}
+                      issuesMap={issueMap}
+                      isVisible={showEstimatesProgress}
+                    />
+                  </>
+                }
                 excludeProperties={["assignee_id"]}
               />
             )}

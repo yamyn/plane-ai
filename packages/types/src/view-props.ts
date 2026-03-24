@@ -66,7 +66,7 @@ export type TCycleGroupOrderByOptions =
   | "end_date" // By end date ascending
   | "-end_date"; // By end date descending
 
-export type TIssueExtraOptions = "show_empty_groups" | "show_empty_sub_groups" | "sub_issue" | "hide_completed_cycles";
+export type TIssueExtraOptions = "show_empty_groups" | "show_empty_sub_groups" | "sub_issue" | "hide_completed_cycles" | "show_estimates_progress";
 
 // Type for cycle status filter
 export type TCycleStatusFilter = "current" | "upcoming" | "completed" | "draft";
@@ -171,6 +171,7 @@ export interface IIssueDisplayFilterOptions {
   sub_issue?: boolean;
   cycle_group_order_by?: TCycleGroupOrderByOptions;
   hide_completed_cycles?: boolean;
+  show_estimates_progress?: boolean;
   cycle_status?: TCycleStatusFilter[];
 }
 export interface IIssueDisplayProperties {
