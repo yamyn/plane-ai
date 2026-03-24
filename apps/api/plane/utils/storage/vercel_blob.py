@@ -221,10 +221,11 @@ class VercelBlobStorage(Storage):
 
     def generate_presigned_post(self, object_name, file_type, file_size, expiration=None):
         """
-        Generate upload data for client-side upload to Vercel Blob.
+        Generate upload data for Vercel Blob.
 
-        Vercel Blob uses a different upload mechanism than S3 presigned POST.
-        This returns the upload URL and headers needed for direct upload.
+        Since Vercel Blob doesn't support S3-style presigned POST (CORS blocks Authorization header),
+        we return a proxy URL that points to our backend. The frontend uploads to our backend,
+        which then uploads to Vercel Blob.
 
         Args:
             object_name: The file path/name to upload
@@ -233,16 +234,17 @@ class VercelBlobStorage(Storage):
             expiration: Not used (kept for API compatibility)
 
         Returns:
-            Dict with upload URL and fields for client upload
+            Dict with upload URL and fields for client upload (S3-compatible format)
         """
         key = self._get_key_name(object_name)
 
+        # Return proxy URL - frontend will POST to our backend
+        # The backend endpoint /api/assets/v2/upload-proxy/ will handle the actual Vercel upload
         return {
-            "url": f"{self.BASE_URL}/{key}",
+            "url": "/api/assets/v2/upload-proxy/",
             "fields": {
+                "key": key,
                 "Content-Type": file_type,
-                "x-api-version": "7",
-                "Authorization": f"Bearer {self.token}",
             },
         }
 
@@ -328,8 +330,13 @@ class VercelBlobStorage(Storage):
         object_name: str,
         content_type: str = None,
         extra_args: dict = {},
-    ) -> bool:
-        """Upload a file directly to Vercel Blob."""
+    ) -> dict | bool:
+        """
+        Upload a file directly to Vercel Blob.
+
+        Returns:
+            dict with 'url' and 'pathname' on success, False on failure
+        """
         try:
             key = self._get_key_name(object_name)
 
@@ -351,7 +358,9 @@ class VercelBlobStorage(Storage):
                 data=data,
             )
 
-            return response.status_code in (200, 201)
+            if response.status_code in (200, 201):
+                return response.json()
+            return False
         except Exception:
             return False
 

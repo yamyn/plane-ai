@@ -116,6 +116,7 @@ from .asset.v2 import (
     DuplicateAssetEndpoint,
     WorkspaceAssetDownloadEndpoint,
     ProjectAssetDownloadEndpoint,
+    VercelBlobUploadProxyEndpoint,
 )
 from .issue.base import (
     IssueListEndpoint,
