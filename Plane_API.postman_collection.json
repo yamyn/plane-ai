@@ -1,0 +1,1351 @@
+{
+	"info": {
+		"_postman_id": "plane-api-collection",
+		"name": "Plane API",
+		"description": "Plane API Collection with API Key authentication.\n\nVariables:\n- `base_url`: Your Plane API server URL (e.g., https://api.plane.so)\n- `api_key`: Your API key from Plane workspace settings",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "x-api-key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{api_key}}",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "api_key",
+			"value": "your-api-key-here",
+			"type": "string"
+		},
+		{
+			"key": "workspace_slug",
+			"value": "my-workspace",
+			"type": "string"
+		},
+		{
+			"key": "project_id",
+			"value": "00000000-0000-0000-0000-000000000000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/me/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "me", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "List Projects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Project\",\n    \"identifier\": \"NP\",\n    \"description\": \"Project description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Project",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Project",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Project Name\",\n    \"description\": \"Updated description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Project",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Project Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/summary/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "summary", ""]
+						}
+					}
+				},
+				{
+					"name": "Archive Project",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/archive/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "archive", ""]
+						}
+					}
+				},
+				{
+					"name": "Unarchive Project",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/archive/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "archive", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Work Items (Issues)",
+			"item": [
+				{
+					"name": "List Work Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Work Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Work Item\",\n    \"description_html\": \"<p>Work item description</p>\",\n    \"priority\": \"medium\",\n    \"state\": \"{{state_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Work Item",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Work Item",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Work Item\",\n    \"priority\": \"high\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Work Item",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Search Work Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/work-items/search/?search=query",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "work-items", "search", ""],
+							"query": [
+								{
+									"key": "search",
+									"value": "query"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Work Item by Identifier",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/work-items/{{project_identifier}}-{{issue_number}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "work-items", "{{project_identifier}}-{{issue_number}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Work Item Links",
+			"item": [
+				{
+					"name": "List Links",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/links/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "links", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Link",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"url\": \"https://example.com\",\n    \"title\": \"Example Link\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/links/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "links", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Link",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/links/{{link_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "links", "{{link_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Link",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Link Title\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/links/{{link_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "links", "{{link_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Link",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/links/{{link_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "links", "{{link_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Work Item Comments",
+			"item": [
+				{
+					"name": "List Comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/comments/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "comments", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"comment_html\": \"<p>This is a comment</p>\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/comments/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "comments", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Comment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/comments/{{comment_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "comments", "{{comment_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Comment",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"comment_html\": \"<p>Updated comment</p>\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/comments/{{comment_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "comments", "{{comment_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/comments/{{comment_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "comments", "{{comment_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Work Item Activities",
+			"item": [
+				{
+					"name": "List Activities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/activities/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "activities", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Activity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/activities/{{activity_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "activities", "{{activity_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Work Item Attachments",
+			"item": [
+				{
+					"name": "List Attachments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/attachments/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "attachments", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Attachment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/attachments/{{attachment_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "attachments", "{{attachment_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Attachment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/work-items/{{work_item_id}}/attachments/{{attachment_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "work-items", "{{work_item_id}}", "attachments", "{{attachment_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cycles",
+			"item": [
+				{
+					"name": "List Cycles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Cycle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sprint 1\",\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2024-01-14\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Cycle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Cycle",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Sprint Name\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Cycle",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "List Cycle Issues",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/cycle-issues/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", "cycle-issues", ""]
+						}
+					}
+				},
+				{
+					"name": "Add Issues to Cycle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"issues\": [\"{{work_item_id}}\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/cycle-issues/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", "cycle-issues", ""]
+						}
+					}
+				},
+				{
+					"name": "Remove Issue from Cycle",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/cycle-issues/{{work_item_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", "cycle-issues", "{{work_item_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Transfer Cycle Issues",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"new_cycle_id\": \"{{target_cycle_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/transfer-issues/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", "transfer-issues", ""]
+						}
+					}
+				},
+				{
+					"name": "Archive Cycle",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/cycles/{{cycle_id}}/archive/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "cycles", "{{cycle_id}}", "archive", ""]
+						}
+					}
+				},
+				{
+					"name": "List Archived Cycles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/archived-cycles/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "archived-cycles", ""]
+						}
+					}
+				},
+				{
+					"name": "Unarchive Cycle",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/archived-cycles/{{cycle_id}}/unarchive/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "archived-cycles", "{{cycle_id}}", "unarchive", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Modules",
+			"item": [
+				{
+					"name": "List Modules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Module",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Module\",\n    \"description\": \"Module description\",\n    \"start_date\": \"2024-01-01\",\n    \"target_date\": \"2024-02-01\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Module",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/{{module_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", "{{module_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Module",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Module Name\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/{{module_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", "{{module_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Module",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/{{module_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", "{{module_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "List Module Issues",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/{{module_id}}/module-issues/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", "{{module_id}}", "module-issues", ""]
+						}
+					}
+				},
+				{
+					"name": "Add Issues to Module",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"issues\": [\"{{work_item_id}}\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/{{module_id}}/module-issues/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", "{{module_id}}", "module-issues", ""]
+						}
+					}
+				},
+				{
+					"name": "Remove Issue from Module",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/{{module_id}}/module-issues/{{work_item_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", "{{module_id}}", "module-issues", "{{work_item_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Archive Module",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/modules/{{module_id}}/archive/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "modules", "{{module_id}}", "archive", ""]
+						}
+					}
+				},
+				{
+					"name": "List Archived Modules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/archived-modules/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "archived-modules", ""]
+						}
+					}
+				},
+				{
+					"name": "Unarchive Module",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/archived-modules/{{module_id}}/unarchive/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "archived-modules", "{{module_id}}", "unarchive", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "States",
+			"item": [
+				{
+					"name": "List States",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/states/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "states", ""]
+						}
+					}
+				},
+				{
+					"name": "Create State",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New State\",\n    \"color\": \"#FF0000\",\n    \"group\": \"started\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/states/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "states", ""]
+						}
+					}
+				},
+				{
+					"name": "Get State",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/states/{{state_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "states", "{{state_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update State",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated State Name\",\n    \"color\": \"#00FF00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/states/{{state_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "states", "{{state_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete State",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/states/{{state_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "states", "{{state_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Labels",
+			"item": [
+				{
+					"name": "List Labels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/labels/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "labels", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Label",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Bug\",\n    \"color\": \"#FF0000\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/labels/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "labels", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Label",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/labels/{{label_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "labels", "{{label_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Label",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Critical Bug\",\n    \"color\": \"#CC0000\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/labels/{{label_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "labels", "{{label_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Label",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/labels/{{label_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "labels", "{{label_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Members",
+			"item": [
+				{
+					"name": "List Workspace Members",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/members/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "members", ""]
+						}
+					}
+				},
+				{
+					"name": "List Project Members",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/members/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "members", ""]
+						}
+					}
+				},
+				{
+					"name": "Add Project Member",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"members\": [\n        {\n            \"member_id\": \"{{user_id}}\",\n            \"role\": 15\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/members/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "members", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Project Member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/members/{{member_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "members", "{{member_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Project Member",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": 20\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/members/{{member_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "members", "{{member_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Remove Project Member",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/members/{{member_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "members", "{{member_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Intake Issues",
+			"item": [
+				{
+					"name": "List Intake Issues",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/intake-issues/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "intake-issues", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Intake Issue",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"issue\": {\n        \"name\": \"New Intake Issue\",\n        \"description_html\": \"<p>Description</p>\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/intake-issues/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "intake-issues", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Intake Issue",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/intake-issues/{{intake_issue_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "intake-issues", "{{intake_issue_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Intake Issue",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/intake-issues/{{intake_issue_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "intake-issues", "{{intake_issue_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Intake Issue",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/projects/{{project_id}}/intake-issues/{{intake_issue_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "projects", "{{project_id}}", "intake-issues", "{{intake_issue_id}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Invitations",
+			"item": [
+				{
+					"name": "List Invitations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/invitations/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "invitations", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"role\": 15\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/invitations/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "invitations", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Stickies",
+			"item": [
+				{
+					"name": "List Stickies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/stickies/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "stickies", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Sticky",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Sticky\",\n    \"description\": \"Sticky content\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/stickies/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "stickies", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Sticky",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/stickies/{{sticky_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "stickies", "{{sticky_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Sticky",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Sticky\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/stickies/{{sticky_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "stickies", "{{sticky_id}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Sticky",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspaces/{{workspace_slug}}/stickies/{{sticky_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspaces", "{{workspace_slug}}", "stickies", "{{sticky_id}}", ""]
+						}
+					}
+				}
+			]
+		}
+	]
+}

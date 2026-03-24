@@ -131,14 +131,12 @@ export const HeaderGroupByCard = observer(function HeaderGroupByCard(props: IHea
 
       const stateGroup: TStateGroups = state.group;
 
-      // Get value to add (estimate points or 1 for count)
-      let value = 1;
-      if (areEstimatesEnabled && issue.estimate_point && currentActiveEstimate) {
+      // Get estimate point value (only issues with valid estimates > 0 are counted)
+      let value = 0;
+      if (issue.estimate_point && currentActiveEstimate) {
         const estimatePoint = currentActiveEstimate.estimatePointById(issue.estimate_point);
         if (estimatePoint?.value) {
           value = parseFloat(estimatePoint.value) || 0;
-        } else {
-          value = 0; // Don't count issues without estimate points when estimates are enabled
         }
       }
 
@@ -236,10 +234,10 @@ export const HeaderGroupByCard = observer(function HeaderGroupByCard(props: IHea
         </div>
 
         {/* Cycle progress indicators - calculated from issues for real-time updates */}
-        {isCycleGroup && cycleDetails && groupIssueIds.length > 0 && (
+        {isCycleGroup && cycleDetails && groupIssueIds.length > 0 && areEstimatesEnabled && (
           <div className="flex items-center gap-1.5">
             {/* Not started (backlog + unstarted) */}
-            <Tooltip tooltipContent={areEstimatesEnabled ? t("project_cycles.not_started_points") : t("project_cycles.not_started_issues")}>
+            <Tooltip tooltipContent={t("project_cycles.not_started_points")}>
               <div className="flex items-center gap-1.5 rounded-md border border-subtle bg-surface-1 px-2 py-0.5 text-11 font-medium text-tertiary">
                 <span
                   className="h-2 w-2 rounded-full"
@@ -249,7 +247,7 @@ export const HeaderGroupByCard = observer(function HeaderGroupByCard(props: IHea
               </div>
             </Tooltip>
             {/* In-progress (started only) */}
-            <Tooltip tooltipContent={areEstimatesEnabled ? t("project_cycles.in_progress_points") : t("project_cycles.in_progress_issues")}>
+            <Tooltip tooltipContent={t("project_cycles.in_progress_points")}>
               <div className="flex items-center gap-1.5 rounded-md border border-subtle bg-surface-1 px-2 py-0.5 text-11 font-medium text-tertiary">
                 <span
                   className="h-2 w-2 rounded-full"
@@ -259,7 +257,7 @@ export const HeaderGroupByCard = observer(function HeaderGroupByCard(props: IHea
               </div>
             </Tooltip>
             {/* Done (completed) */}
-            <Tooltip tooltipContent={areEstimatesEnabled ? t("project_cycles.done_points") : t("project_cycles.done_issues")}>
+            <Tooltip tooltipContent={t("project_cycles.done_points")}>
               <div className="flex items-center gap-1.5 rounded-md border border-subtle bg-surface-1 px-2 py-0.5 text-11 font-medium text-tertiary">
                 <span
                   className="h-2 w-2 rounded-full"
@@ -269,7 +267,7 @@ export const HeaderGroupByCard = observer(function HeaderGroupByCard(props: IHea
               </div>
             </Tooltip>
             {/* Total */}
-            <Tooltip tooltipContent={areEstimatesEnabled ? t("project_cycles.total_points") : t("project_cycles.total_issues")}>
+            <Tooltip tooltipContent={t("project_cycles.total_points")}>
               <div className="flex items-center gap-1.5 rounded-md border border-accent-primary/30 bg-accent-primary/10 px-2 py-0.5 text-11 font-medium text-accent-primary">
                 <span>{groupProgress.total}</span>
               </div>
