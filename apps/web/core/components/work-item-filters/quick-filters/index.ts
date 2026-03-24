@@ -5,5 +5,6 @@
  */
 
 export * from "./assignee-avatar-filter";
+export * from "./estimates-progress-bar";
 export * from "./quick-filters-bar";
 export * from "./use-quick-filters";

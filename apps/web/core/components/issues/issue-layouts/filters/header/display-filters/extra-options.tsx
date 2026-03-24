@@ -32,6 +32,10 @@ const ISSUE_EXTRA_OPTIONS: {
     key: "hide_completed_cycles",
     titleTranslationKey: "issue.display.extra.hide_completed_cycles",
   }, // only shown when group_by is cycle
+  {
+    key: "show_estimates_progress",
+    titleTranslationKey: "issue.display.extra.show_estimates_progress",
+  }, // only shown when estimates are enabled
 ];
 
 type Props = {
@@ -40,15 +44,17 @@ type Props = {
     show_empty_groups: boolean;
     show_empty_sub_groups?: boolean;
     hide_completed_cycles?: boolean;
+    show_estimates_progress?: boolean;
   };
   handleUpdate: (key: keyof IIssueDisplayFilterOptions, val: boolean) => void;
   enabledExtraOptions: TIssueExtraOptions[];
   groupBy?: TIssueGroupByOptions;
   subGroupBy?: TIssueGroupByOptions;
+  areEstimatesEnabled?: boolean;
 };
 
 export const FilterExtraOptions = observer(function FilterExtraOptions(props: Props) {
-  const { selectedExtraOptions, handleUpdate, enabledExtraOptions, groupBy, subGroupBy } = props;
+  const { selectedExtraOptions, handleUpdate, enabledExtraOptions, groupBy, subGroupBy, areEstimatesEnabled } = props;
   // hooks
   const { t } = useTranslation();
   const isExtraOptionEnabled = (option: TIssueExtraOptions) => {
@@ -56,6 +62,8 @@ export const FilterExtraOptions = observer(function FilterExtraOptions(props: Pr
     if (option === "hide_completed_cycles" && groupBy !== "cycle") return false;
     // Show show_empty_sub_groups only when sub_group_by is set
     if (option === "show_empty_sub_groups" && !subGroupBy) return false;
+    // Show show_estimates_progress only when estimates are enabled
+    if (option === "show_estimates_progress" && !areEstimatesEnabled) return false;
     return enabledExtraOptions.includes(option);
   };
 

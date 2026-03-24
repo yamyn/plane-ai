@@ -34,6 +34,7 @@ type Props = {
   cycleViewDisabled?: boolean;
   moduleViewDisabled?: boolean;
   isEpic?: boolean;
+  areEstimatesEnabled?: boolean;
 };
 
 export const DisplayFiltersSelection = observer(function DisplayFiltersSelection(props: Props) {
@@ -47,6 +48,7 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
     cycleViewDisabled = false,
     moduleViewDisabled = false,
     isEpic = false,
+    areEstimatesEnabled = false,
   } = props;
 
   const isDisplayFilterEnabled = (displayFilter: keyof IIssueDisplayFilterOptions) =>
@@ -162,6 +164,7 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
               show_empty_sub_groups: displayFilters?.show_empty_sub_groups ?? true,
               sub_issue: displayFilters?.sub_issue ?? true,
               hide_completed_cycles: displayFilters?.hide_completed_cycles ?? false,
+              show_estimates_progress: displayFilters?.show_estimates_progress ?? false,
             }}
             handleUpdate={(key, val) =>
               handleDisplayFiltersUpdate({
@@ -171,6 +174,7 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
             enabledExtraOptions={layoutDisplayFiltersOptions?.extra_options.values}
             groupBy={displayFilters?.group_by}
             subGroupBy={displayFilters?.sub_group_by}
+            areEstimatesEnabled={areEstimatesEnabled}
           />
         </div>
       )}

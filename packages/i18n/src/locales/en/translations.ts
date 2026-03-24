@@ -875,6 +875,7 @@ export default {
         show_empty_groups: "Show empty groups",
         show_empty_sub_groups: "Show empty sub-groups",
         hide_completed_cycles: "Hide completed cycles",
+        show_estimates_progress: "Show estimates progress",
       },
       cycle_group_order_by: "Order cycles by",
       cycle_status: "Sprint status",

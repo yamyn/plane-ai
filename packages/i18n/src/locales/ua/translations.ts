@@ -1049,6 +1049,7 @@ export default {
         show_empty_groups: "Показати порожні групи",
         show_empty_sub_groups: "Показати порожні підгрупи",
         hide_completed_cycles: "Приховати завершені цикли",
+        show_estimates_progress: "Показати прогрес оцінок",
       },
     },
     layouts: {

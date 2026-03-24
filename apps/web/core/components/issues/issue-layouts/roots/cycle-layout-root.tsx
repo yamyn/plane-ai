@@ -18,7 +18,7 @@ import { TransferIssuesModal } from "@/components/cycles/transfer-issues-modal";
 // hooks
 import { ProjectLevelWorkItemFiltersHOC } from "@/components/work-item-filters/filters-hoc/project-level";
 import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
-import { QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
+import { EstimatesProgressBar, QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
 import { useCycle } from "@/hooks/store/use-cycle";
 import { useIssues } from "@/hooks/store/use-issues";
 import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
@@ -60,13 +60,14 @@ export const CycleLayoutRoot = observer(function CycleLayoutRoot() {
   const projectId = routerProjectId ? routerProjectId.toString() : undefined;
   const cycleId = routerCycleId ? routerCycleId.toString() : undefined;
   // store hooks
-  const { issuesFilter } = useIssues(EIssuesStoreType.CYCLE);
+  const { issues, issuesFilter, issueMap } = useIssues(EIssuesStoreType.CYCLE);
   const { getCycleById } = useCycle();
   // state
   const [transferIssuesModal, setTransferIssuesModal] = useState(false);
   // derived values
   const workItemFilters = cycleId ? issuesFilter?.getIssueFilters(cycleId) : undefined;
   const activeLayout = workItemFilters?.displayFilters?.layout;
+  const showEstimatesProgress = workItemFilters?.displayFilters?.show_estimates_progress ?? false;
 
   useSWR(
     workspaceSlug && projectId && cycleId ? `CYCLE_ISSUES_${workspaceSlug}_${projectId}_${cycleId}` : null,
@@ -121,7 +122,16 @@ export const CycleLayoutRoot = observer(function CycleLayoutRoot() {
                   trackerElements={{
                     saveView: PROJECT_VIEW_TRACKER_ELEMENTS.CYCLE_HEADER_SAVE_AS_VIEW_BUTTON,
                   }}
-                  leftSlot={<QuickFiltersBar filter={cycleWorkItemsFilter} projectId={projectId} />}
+                  leftSlot={
+                    <>
+                      <QuickFiltersBar filter={cycleWorkItemsFilter} projectId={projectId} />
+                      <EstimatesProgressBar
+                        groupedIssueIds={issues.groupedIssueIds}
+                        issuesMap={issueMap}
+                        isVisible={showEstimatesProgress}
+                      />
+                    </>
+                  }
                   excludeProperties={["assignee_id"]}
                 />
               )}

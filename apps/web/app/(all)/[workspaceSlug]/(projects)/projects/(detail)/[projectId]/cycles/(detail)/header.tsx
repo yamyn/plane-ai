@@ -42,6 +42,7 @@ import {
 } from "@/components/issues/issue-layouts/filters";
 import { WorkItemFiltersToggle } from "@/components/work-item-filters/filters-toggle";
 // hooks
+import { useProjectEstimates } from "@/hooks/store/estimates";
 import { useCommandPalette } from "@/hooks/store/use-command-palette";
 import { useCycle } from "@/hooks/store/use-cycle";
 import { useIssues } from "@/hooks/store/use-issues";
@@ -72,10 +73,12 @@ export const CycleIssuesHeader = observer(function CycleIssuesHeader() {
   const { currentProjectCycleIds, getCycleById } = useCycle();
   const { toggleCreateIssueModal } = useCommandPalette();
   const { currentProjectDetails, loader } = useProject();
+  const { areEstimateEnabledByProjectId } = useProjectEstimates();
   const { isMobile } = usePlatformOS();
   const { allowPermissions } = useUserPermissions();
 
   const activeLayout = issueFilters?.displayFilters?.layout;
+  const areEstimatesEnabled = projectId ? areEstimateEnabledByProjectId(projectId.toString()) : false;
 
   const { setValue, storedValue } = useLocalStorage("cycle_sidebar_collapsed", false);
 
@@ -261,6 +264,7 @@ export const CycleIssuesHeader = observer(function CycleIssuesHeader() {
                 ignoreGroupedFilters={["cycle"]}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
                 moduleViewDisabled={!currentProjectDetails?.module_view}
+                areEstimatesEnabled={areEstimatesEnabled}
               />
             </FiltersDropdown>
 

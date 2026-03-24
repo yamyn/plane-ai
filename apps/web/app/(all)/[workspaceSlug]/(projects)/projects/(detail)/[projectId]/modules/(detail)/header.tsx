@@ -37,6 +37,7 @@ import {
 import { ModuleQuickActions } from "@/components/modules";
 import { WorkItemFiltersToggle } from "@/components/work-item-filters/filters-toggle";
 // hooks
+import { useProjectEstimates } from "@/hooks/store/estimates";
 import { useCommandPalette } from "@/hooks/store/use-command-palette";
 import { useIssues } from "@/hooks/store/use-issues";
 import { useModule } from "@/hooks/store/use-module";
@@ -71,12 +72,14 @@ export const ModuleIssuesHeader = observer(function ModuleIssuesHeader() {
   const { toggleCreateIssueModal } = useCommandPalette();
   const { allowPermissions } = useUserPermissions();
   const { currentProjectDetails, loader } = useProject();
+  const { areEstimateEnabledByProjectId } = useProjectEstimates();
   // local storage
   const { setValue, storedValue } = useLocalStorage("module_sidebar_collapsed", "false");
   // derived values
   const isSidebarCollapsed = storedValue ? (storedValue === "true" ? true : false) : false;
   const activeLayout = issueFilters?.displayFilters?.layout;
   const moduleDetails = moduleId ? getModuleById(moduleId) : undefined;
+  const areEstimatesEnabled = projectId ? areEstimateEnabledByProjectId(projectId.toString()) : false;
   const canUserCreateIssue = allowPermissions(
     [EUserPermissions.ADMIN, EUserPermissions.MEMBER],
     EUserPermissionsLevel.PROJECT
@@ -224,6 +227,7 @@ export const ModuleIssuesHeader = observer(function ModuleIssuesHeader() {
                 ignoreGroupedFilters={["module"]}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
                 moduleViewDisabled={!currentProjectDetails?.module_view}
+                areEstimatesEnabled={areEstimatesEnabled}
               />
             </FiltersDropdown>
           </div>
