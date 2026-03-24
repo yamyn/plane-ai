@@ -29,6 +29,7 @@ import { cn } from "@plane/utils";
 import { ListLoaderItemRow } from "@/components/ui/loader/layouts/list-layout-loader";
 // hooks
 import { useProjectState } from "@/hooks/store/use-project-state";
+import { useCycleFromStatusFilter } from "@/hooks/use-cycle-from-status-filter";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useIssuesStore } from "@/hooks/use-issue-layout-store";
 import type { TSelectionHelper } from "@/hooks/use-multiple-select";
@@ -107,6 +108,7 @@ export const ListGroup = observer(function ListGroup(props: Props) {
   const groupRef = useRef<HTMLDivElement | null>(null);
   const { t } = useTranslation();
   const projectState = useProjectState();
+  const cycleIdFromFilter = useCycleFromStatusFilter();
 
   const {
     issues: { getGroupIssueCount, getPaginationData, getIssueLoader },
@@ -171,6 +173,11 @@ export const ListGroup = observer(function ListGroup(props: Props) {
       } else {
         preloadedData = { ...preloadedData, [groupByKey]: value };
       }
+    }
+
+    // If cycle is not set via group_by, use cycle from status filter
+    if (!("cycle_id" in preloadedData) && cycleIdFromFilter) {
+      preloadedData = { ...preloadedData, cycle_id: cycleIdFromFilter };
     }
 
     return preloadedData;

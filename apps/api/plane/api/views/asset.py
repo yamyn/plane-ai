@@ -16,7 +16,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiRequest
 
 # Module Imports
 from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
-from plane.settings.storage import S3Storage
+from plane.utils.storage import get_storage
 from plane.db.models import FileAsset, User, Workspace
 from plane.api.views.base import BaseAPIView
 from plane.api.serializers import (
@@ -160,7 +160,7 @@ class UserAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
         # Return the presigned URL
@@ -333,7 +333,7 @@ class UserServerAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request, is_server=True)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
         # Return the presigned URL
@@ -437,7 +437,7 @@ class GenericAssetEndpoint(BaseAPIView):
                 )
 
             # Generate presigned URL for GET
-            storage = S3Storage(request=request, is_server=True)
+            storage = get_storage(request=request)
             presigned_url = storage.generate_presigned_url(
                 object_name=asset.asset.name, filename=asset.attributes.get("name")
             )
@@ -561,7 +561,7 @@ class GenericAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request, is_server=True)
+        storage = get_storage(request=request)
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
 
         return Response(

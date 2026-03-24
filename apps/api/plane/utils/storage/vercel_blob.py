@@ -218,3 +218,157 @@ class VercelBlobStorage(Storage):
 
     def get_modified_time(self, name):
         raise NotImplementedError("Vercel Blob doesn't expose modification time via HEAD")
+
+    def generate_presigned_post(self, object_name, file_type, file_size, expiration=None):
+        """
+        Generate upload data for client-side upload to Vercel Blob.
+
+        Vercel Blob uses a different upload mechanism than S3 presigned POST.
+        This returns the upload URL and headers needed for direct upload.
+
+        Args:
+            object_name: The file path/name to upload
+            file_type: The content type of the file
+            file_size: The size of the file in bytes
+            expiration: Not used (kept for API compatibility)
+
+        Returns:
+            Dict with upload URL and fields for client upload
+        """
+        key = self._get_key_name(object_name)
+
+        return {
+            "url": f"{self.BASE_URL}/{key}",
+            "fields": {
+                "Content-Type": file_type,
+                "x-api-version": "7",
+                "Authorization": f"Bearer {self.token}",
+            },
+        }
+
+    def generate_presigned_url(
+        self,
+        object_name,
+        expiration=None,
+        http_method="GET",
+        disposition="inline",
+        filename=None,
+    ):
+        """
+        Generate a URL to access a Vercel Blob object.
+
+        Vercel Blob URLs are public by default, so no signing is needed.
+
+        Args:
+            object_name: The file path/name or full URL
+            expiration: Not used (kept for API compatibility)
+            http_method: Not used (kept for API compatibility)
+            disposition: Not used (Vercel Blob doesn't support this)
+            filename: Not used (kept for API compatibility)
+
+        Returns:
+            The public URL for the blob
+        """
+        return self.url(object_name)
+
+    def get_object_metadata(self, object_name):
+        """Get the metadata for a Vercel Blob object."""
+        url = self.url(object_name)
+        response = requests.head(url)
+
+        if response.status_code != 200:
+            return None
+
+        return {
+            "ContentType": response.headers.get("Content-Type"),
+            "ContentLength": int(response.headers.get("Content-Length", 0)),
+            "LastModified": response.headers.get("Last-Modified"),
+            "ETag": response.headers.get("ETag"),
+            "Metadata": {},
+        }
+
+    def copy_object(self, object_name, new_object_name):
+        """
+        Copy a Vercel Blob object to a new location.
+
+        Vercel Blob doesn't have native copy, so we download and re-upload.
+        """
+        try:
+            # Download the source blob
+            source_url = self.url(object_name)
+            response = requests.get(source_url)
+
+            if response.status_code != 200:
+                return None
+
+            # Upload to new location
+            new_key = self._get_key_name(new_object_name)
+            content_type = response.headers.get("Content-Type", "application/octet-stream")
+
+            upload_response = requests.put(
+                f"{self.BASE_URL}/{new_key}",
+                headers={
+                    **self.headers,
+                    "Content-Type": content_type,
+                    "x-api-version": "7",
+                },
+                data=response.content,
+            )
+
+            if upload_response.status_code not in (200, 201):
+                return None
+
+            return upload_response.json()
+        except Exception:
+            return None
+
+    def upload_file(
+        self,
+        file_obj,
+        object_name: str,
+        content_type: str = None,
+        extra_args: dict = {},
+    ) -> bool:
+        """Upload a file directly to Vercel Blob."""
+        try:
+            key = self._get_key_name(object_name)
+
+            if hasattr(file_obj, 'read'):
+                data = file_obj.read()
+            else:
+                data = file_obj
+
+            if not content_type:
+                content_type = "application/octet-stream"
+
+            response = requests.put(
+                f"{self.BASE_URL}/{key}",
+                headers={
+                    **self.headers,
+                    "Content-Type": content_type,
+                    "x-api-version": "7",
+                },
+                data=data,
+            )
+
+            return response.status_code in (200, 201)
+        except Exception:
+            return False
+
+    def delete_files(self, object_names):
+        """Delete multiple Vercel Blob objects."""
+        try:
+            urls = [self.url(name) for name in object_names]
+
+            response = requests.post(
+                f"{self.BASE_URL}/delete",
+                headers={
+                    **self.headers,
+                    "Content-Type": "application/json",
+                },
+                json={"urls": urls},
+            )
+
+            return response.status_code in (200, 204)
+        except Exception:
+            return False

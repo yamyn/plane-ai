@@ -10,6 +10,7 @@ import type { TIssue, TPaginationData } from "@plane/types";
 // components
 import { renderFormattedPayloadDate } from "@plane/utils";
 // helpers
+import { useCycleFromStatusFilter } from "@/hooks/use-cycle-from-status-filter";
 import { useIssuesStore } from "@/hooks/use-issue-layout-store";
 import type { TRenderQuickActions } from "../list/list-view-types";
 import { CalendarIssueBlockRoot } from "./issue-block-root";
@@ -52,6 +53,7 @@ export const CalendarIssueBlocks = observer(function CalendarIssueBlocks(props: 
   } = props;
   const formattedDatePayload = renderFormattedPayloadDate(date);
   const { t } = useTranslation();
+  const cycleIdFromFilter = useCycleFromStatusFilter();
 
   const {
     issues: { getGroupIssueCount, getPaginationData, getIssueLoader },
@@ -93,6 +95,7 @@ export const CalendarIssueBlocks = observer(function CalendarIssueBlocks(props: 
           <CalendarQuickAddIssueActions
             prePopulatedData={{
               target_date: formattedDatePayload,
+              ...(cycleIdFromFilter && { cycle_id: cycleIdFromFilter }),
             }}
             quickAddCallback={quickAddCallback}
             addIssuesToView={addIssuesToView}

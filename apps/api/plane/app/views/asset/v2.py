@@ -19,7 +19,7 @@ from rest_framework.permissions import AllowAny
 # Module imports
 from ..base import BaseAPIView
 from plane.db.models import FileAsset, Workspace, Project, User
-from plane.settings.storage import S3Storage
+from plane.utils.storage import get_storage
 from plane.app.permissions import allow_permission, ROLE
 from plane.utils.cache import invalidate_cache_directly
 from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
@@ -154,7 +154,7 @@ class UserAssetsV2Endpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
         # Return the presigned URL
@@ -363,7 +363,7 @@ class WorkspaceFileAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
         # Return the presigned URL
@@ -418,7 +418,7 @@ class WorkspaceFileAssetEndpoint(BaseAPIView):
             )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         signed_url = storage.generate_presigned_url(
             object_name=asset.asset.name,
@@ -458,7 +458,7 @@ class StaticFileAssetEndpoint(BaseAPIView):
             )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         signed_url = storage.generate_presigned_url(object_name=asset.asset.name)
         # Redirect to the signed URL
@@ -563,7 +563,7 @@ class ProjectAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
         # Return the presigned URL
@@ -616,7 +616,7 @@ class ProjectAssetEndpoint(BaseAPIView):
             )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         signed_url = storage.generate_presigned_url(
             object_name=asset.asset.name,
@@ -751,7 +751,7 @@ class DuplicateAssetEndpoint(BaseAPIView):
             if not Project.objects.filter(id=project_id, workspace=workspace).exists():
                 return Response({"error": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         original_asset = FileAsset.objects.filter(id=asset_id, is_uploaded=True).first()
 
         if not original_asset:
@@ -797,7 +797,7 @@ class WorkspaceAssetDownloadEndpoint(BaseAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         signed_url = storage.generate_presigned_url(
             object_name=asset.asset.name,
             disposition="attachment",
@@ -825,7 +825,7 @@ class ProjectAssetDownloadEndpoint(BaseAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         signed_url = storage.generate_presigned_url(
             object_name=asset.asset.name,
             disposition="attachment",

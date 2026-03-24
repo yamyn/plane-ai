@@ -7,7 +7,7 @@ from celery import shared_task
 
 # Module imports
 from plane.db.models import FileAsset
-from plane.settings.storage import S3Storage
+from plane.utils.storage import get_storage
 from plane.utils.exception_logger import log_exception
 
 
@@ -16,8 +16,8 @@ def get_asset_object_metadata(asset_id):
     try:
         # Get the asset
         asset = FileAsset.objects.get(pk=asset_id)
-        # Create an instance of the S3 storage
-        storage = S3Storage()
+        # Create an instance of the storage
+        storage = get_storage()
         # Get the storage
         asset.storage_metadata = storage.get_object_metadata(object_name=asset.asset.name)
         # Save the asset
