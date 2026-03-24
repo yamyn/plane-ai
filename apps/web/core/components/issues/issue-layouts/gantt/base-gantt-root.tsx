@@ -21,6 +21,7 @@ import { IssueGanttSidebar } from "@/components/gantt-chart/sidebar/issues/sideb
 // hooks
 import { useIssues } from "@/hooks/store/use-issues";
 import { useUserPermissions } from "@/hooks/store/user";
+import { useCycleFromStatusFilter } from "@/hooks/use-cycle-from-status-filter";
 import { useIssueStoreType } from "@/hooks/use-issue-layout-store";
 import { useIssuesActions } from "@/hooks/use-issues-actions";
 import { useTimeLineChart } from "@/hooks/use-timeline-chart";
@@ -54,6 +55,7 @@ export const BaseGanttRoot = observer(function BaseGanttRoot(props: IBaseGanttRo
   const { issues, issuesFilter } = useIssues(storeType);
   const { fetchIssues, fetchNextIssues, updateIssue, quickAddIssue } = useIssuesActions(storeType);
   const { initGantt } = useTimeLineChart(GANTT_TIMELINE_TYPE.ISSUE);
+  const cycleIdFromFilter = useCycleFromStatusFilter();
   // store hooks
   const { allowPermissions } = useUserPermissions();
 
@@ -118,6 +120,7 @@ export const BaseGanttRoot = observer(function BaseGanttRoot(props: IBaseGanttRo
         prePopulatedData={{
           start_date: renderFormattedPayloadDate(new Date()),
           target_date: renderFormattedPayloadDate(targetDate),
+          ...(cycleIdFromFilter && { cycle_id: cycleIdFromFilter }),
         }}
         quickAddCallback={quickAddIssue}
         isEpic={isEpic}

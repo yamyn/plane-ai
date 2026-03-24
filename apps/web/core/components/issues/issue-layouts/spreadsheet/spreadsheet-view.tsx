@@ -15,6 +15,7 @@ import { EIssueLayoutTypes } from "@plane/types";
 import { MultipleSelectGroup } from "@/components/core/multiple-select";
 // hooks
 import { useProject } from "@/hooks/store/use-project";
+import { useCycleFromStatusFilter } from "@/hooks/use-cycle-from-status-filter";
 // plane web components
 import { IssueBulkOperationsRoot } from "@/plane-web/components/issues/bulk-operations";
 // plane web hooks
@@ -64,6 +65,7 @@ export const SpreadsheetView = observer(function SpreadsheetView(props: Props) {
   const portalRef = useRef<HTMLDivElement | null>(null);
   // store hooks
   const { currentProjectDetails } = useProject();
+  const cycleIdFromFilter = useCycleFromStatusFilter();
   // plane web hooks
   const isBulkOperationsEnabled = useBulkOperationStatus();
 
@@ -115,6 +117,7 @@ export const SpreadsheetView = observer(function SpreadsheetView(props: Props) {
                   <QuickAddIssueRoot
                     layout={EIssueLayoutTypes.SPREADSHEET}
                     QuickAddButton={SpreadsheetAddIssueButton}
+                    prePopulatedData={cycleIdFromFilter ? { cycle_id: cycleIdFromFilter } : undefined}
                     quickAddCallback={quickAddCallback}
                     isEpic={isEpic}
                   />

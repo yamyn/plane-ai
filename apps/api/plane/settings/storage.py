@@ -7,6 +7,9 @@ import os
 import uuid
 from urllib.parse import quote
 
+# Third party imports
+from botocore.exceptions import ClientError
+
 # Module imports
 from plane.utils.exception_logger import log_exception
 

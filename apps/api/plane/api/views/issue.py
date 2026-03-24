@@ -72,7 +72,7 @@ from plane.db.models import (
     CycleIssue,
     Workspace,
 )
-from plane.settings.storage import S3Storage
+from plane.utils.storage import get_storage
 from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
 from .base import BaseAPIView
 from plane.utils.host import base_host
@@ -1890,7 +1890,7 @@ class IssueAttachmentListCreateAPIEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
         # Return the presigned URL
@@ -2059,7 +2059,7 @@ class IssueAttachmentDetailAPIEndpoint(BaseAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         presigned_url = storage.generate_presigned_url(
             object_name=asset.asset.name,
             disposition="attachment",

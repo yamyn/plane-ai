@@ -17,7 +17,7 @@ from rest_framework.response import Response
 
 from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
 from plane.db.models import DeployBoard, FileAsset
-from plane.settings.storage import S3Storage
+from plane.utils.storage import get_storage
 
 # Module imports
 from .base import BaseAPIView
@@ -59,7 +59,7 @@ class EntityAssetEndpoint(BaseAPIView):
             )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         signed_url = storage.generate_presigned_url(object_name=asset.asset.name)
         # Redirect to the signed URL
@@ -119,7 +119,7 @@ class EntityAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request)
+        storage = get_storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size)
         # Return the presigned URL

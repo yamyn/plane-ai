@@ -37,6 +37,7 @@ import {
 import { KanbanIssueBlockLoader } from "@/components/ui/loader/layouts/kanban-layout-loader";
 // hooks
 import { useProjectState } from "@/hooks/store/use-project-state";
+import { useCycleFromStatusFilter } from "@/hooks/use-cycle-from-status-filter";
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useIssuesStore } from "@/hooks/use-issue-layout-store";
 // Plane-web
@@ -99,6 +100,7 @@ export const KanbanGroup = observer(function KanbanGroup(props: IKanbanGroup) {
   const { t } = useTranslation();
   // hooks
   const projectState = useProjectState();
+  const cycleIdFromFilter = useCycleFromStatusFilter();
 
   const {
     issues: { getGroupIssueCount, getPaginationData, getIssueLoader },
@@ -242,6 +244,11 @@ export const KanbanGroup = observer(function KanbanGroup(props: IKanbanGroup) {
       } else {
         preloadedData = { ...preloadedData, [subGroupByKey]: subGroupValue };
       }
+    }
+
+    // If cycle is not set via group_by or sub_group_by, use cycle from status filter
+    if (!("cycle_id" in preloadedData) && cycleIdFromFilter) {
+      preloadedData = { ...preloadedData, cycle_id: cycleIdFromFilter };
     }
 
     return preloadedData;
