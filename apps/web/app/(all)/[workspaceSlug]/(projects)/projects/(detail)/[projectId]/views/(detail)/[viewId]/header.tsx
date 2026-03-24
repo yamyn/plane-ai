@@ -29,6 +29,7 @@ import { DisplayFiltersSelection, FiltersDropdown, LayoutSelection } from "@/com
 import { ViewQuickActions } from "@/components/views/quick-actions";
 import { WorkItemFiltersToggle } from "@/components/work-item-filters/filters-toggle";
 // hooks
+import { useProjectEstimates } from "@/hooks/store/estimates";
 import { useCommandPalette } from "@/hooks/store/use-command-palette";
 import { useIssues } from "@/hooks/store/use-issues";
 import { useProject } from "@/hooks/store/use-project";
@@ -54,8 +55,10 @@ export const ProjectViewIssuesHeader = observer(function ProjectViewIssuesHeader
 
   const { currentProjectDetails, loader } = useProject();
   const { projectViewIds, getViewById } = useProjectView();
+  const { areEstimateEnabledByProjectId } = useProjectEstimates();
 
   const activeLayout = issueFilters?.displayFilters?.layout;
+  const areEstimatesEnabled = projectId ? areEstimateEnabledByProjectId(projectId.toString()) : false;
 
   const handleLayoutChange = useCallback(
     (layout: EIssueLayoutTypes) => {
@@ -193,6 +196,7 @@ export const ProjectViewIssuesHeader = observer(function ProjectViewIssuesHeader
                 handleDisplayPropertiesUpdate={handleDisplayProperties}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
                 moduleViewDisabled={!currentProjectDetails?.module_view}
+                areEstimatesEnabled={areEstimatesEnabled}
               />
             </FiltersDropdown>
           )}

@@ -14,6 +14,7 @@ import { Button } from "@plane/propel/button";
 import type { IIssueDisplayFilterOptions, IIssueDisplayProperties } from "@plane/types";
 import { EIssueLayoutTypes, EIssuesStoreType } from "@plane/types";
 // hooks
+import { useProjectEstimates } from "@/hooks/store/estimates";
 import { useIssues } from "@/hooks/store/use-issues";
 // plane web imports
 import type { TProject } from "@/plane-web/types";
@@ -59,8 +60,10 @@ export const HeaderFilters = observer(function HeaderFilters(props: Props) {
   const {
     issuesFilter: { issueFilters, updateFilters },
   } = useIssues(storeType);
+  const { areEstimateEnabledByProjectId } = useProjectEstimates();
   // derived values
   const activeLayout = issueFilters?.displayFilters?.layout;
+  const areEstimatesEnabled = areEstimateEnabledByProjectId(projectId);
   const layoutDisplayFiltersOptions = ISSUE_STORE_TO_FILTERS_MAP[storeType]?.layoutOptions[activeLayout];
 
   const handleLayoutChange = useCallback(
@@ -124,6 +127,7 @@ export const HeaderFilters = observer(function HeaderFilters(props: Props) {
           cycleViewDisabled={!currentProjectDetails?.cycle_view}
           moduleViewDisabled={!currentProjectDetails?.module_view}
           isEpic={storeType === EIssuesStoreType.EPIC}
+          areEstimatesEnabled={areEstimatesEnabled}
         />
       </FiltersDropdown>
       {canUserCreateIssue ? (

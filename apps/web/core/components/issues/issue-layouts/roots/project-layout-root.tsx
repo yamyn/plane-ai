@@ -14,7 +14,7 @@ import { Spinner } from "@plane/ui";
 // components
 import { ProjectLevelWorkItemFiltersHOC } from "@/components/work-item-filters/filters-hoc/project-level";
 import { WorkItemFiltersRow } from "@/components/work-item-filters/filters-row";
-import { QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
+import { EstimatesProgressBar, QuickFiltersBar } from "@/components/work-item-filters/quick-filters";
 // hooks
 import { useIssues } from "@/hooks/store/use-issues";
 import { IssuesStoreContext } from "@/hooks/use-issue-layout-store";
@@ -52,10 +52,11 @@ export const ProjectLayoutRoot = observer(function ProjectLayoutRoot() {
   const workspaceSlug = routerWorkspaceSlug ? routerWorkspaceSlug.toString() : undefined;
   const projectId = routerProjectId ? routerProjectId.toString() : undefined;
   // hooks
-  const { issues, issuesFilter } = useIssues(EIssuesStoreType.PROJECT);
+  const { issues, issuesFilter, issueMap } = useIssues(EIssuesStoreType.PROJECT);
   // derived values
   const workItemFilters = projectId ? issuesFilter?.getIssueFilters(projectId) : undefined;
   const activeLayout = workItemFilters?.displayFilters?.layout;
+  const showEstimatesProgress = workItemFilters?.displayFilters?.show_estimates_progress ?? false;
 
   useSWR(
     workspaceSlug && projectId ? `PROJECT_ISSUES_${workspaceSlug}_${projectId}` : null,
@@ -88,7 +89,16 @@ export const ProjectLayoutRoot = observer(function ProjectLayoutRoot() {
                 trackerElements={{
                   saveView: PROJECT_VIEW_TRACKER_ELEMENTS.PROJECT_HEADER_SAVE_AS_VIEW_BUTTON,
                 }}
-                leftSlot={<QuickFiltersBar filter={projectWorkItemsFilter} projectId={projectId} />}
+                leftSlot={
+                  <>
+                    <QuickFiltersBar filter={projectWorkItemsFilter} projectId={projectId} />
+                    <EstimatesProgressBar
+                      groupedIssueIds={issues.groupedIssueIds}
+                      issuesMap={issueMap}
+                      isVisible={showEstimatesProgress}
+                    />
+                  </>
+                }
                 excludeProperties={["assignee_id"]}
               />
             )}
